@@ -4,13 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context=".ui.home.HomeFragment">
 
     <Button
         android:id="@+id/last_man_button"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
+        android:layout_width="220dp"
+        android:layout_height="100dp"
         android:text="@string/last_man"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,9 +21,11 @@
         app:layout_constraintVertical_bias="0.35" />
 
     <Button
-        android:id="@+id/category_quiz_button"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
+        android:id="@+id/friendly_quitz_button"
+        android:layout_width="220dp"
+        android:layout_height="100dp"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@color/white"
         android:text="@string/category_quiz"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

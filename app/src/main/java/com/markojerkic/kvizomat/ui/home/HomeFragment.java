@@ -46,7 +46,7 @@ public class HomeFragment extends Fragment {
 
         // Set MainActivity main buttons upon entering
         mLastManButton = root.findViewById(R.id.last_man_button);
-        mCategoryButton = root.findViewById(R.id.category_quiz_button);
+        mCategoryButton = root.findViewById(R.id.friendly_quitz_button);
 
         // Database listener
         mListaPitanja = new ArrayList<>();
@@ -92,6 +92,8 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
             }
         });
+        mCategoryButton.setClickable(false);
+        mCategoryButton.setVisibility(View.INVISIBLE);
         mCategoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

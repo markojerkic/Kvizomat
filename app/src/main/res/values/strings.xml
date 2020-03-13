@@ -11,8 +11,8 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
 
-    <string name="last_man">Prva linija</string>
-    <string name="category_quiz">Kategorije</string>
+    <string name="last_man">Solo igrač</string>
+    <string name="category_quiz">Protiv prijatelja</string>
 
     <string name="home_second">Home Second</string>
 

@@ -1,25 +1,31 @@
 package com.markojerkic.kvizomat.ui.kviz;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.os.Handler;
+import android.os.PersistableBundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.markojerkic.kvizomat.R;
+public class KvizSplashFragment extends AppCompatActivity {
 
-public class KvizSplashFragment extends Fragment {
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.kviz_splash, container, false);
-    }
+    private KvizInformacije mInfo;
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
 
+        mInfo = (KvizInformacije) getIntent().getSerializableExtra("pitanja");
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent pitanjeActivity = new Intent(getApplicationContext(), Kviz.class);
+
+                pitanjeActivity.putExtra("pitanja", mInfo);
+                startActivity(pitanjeActivity);
+            }
+        }, 1000);
     }
 }
