@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -40,14 +41,20 @@ public class ListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        convertView = LayoutInflater.from(context).inflate(R.layout.korisnik_jedan, parent);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context)
+                    .inflate(R.layout.korisnik_jedan, parent, false);
+        }
+
+        Korisnik k = (Korisnik) getItem(position);
 
         ImageView slika = convertView.findViewById(R.id.slika_korisnik_list);
         TextView ime = convertView.findViewById(R.id.ime_korisnika_list);
         TextView email = convertView.findViewById(R.id.email_korisnika_list);
 
-        ime.setText(korisnici.get(0).getIme());
-        email.setText(korisnici.get(0).getEmail());
+        ime.setText(k.getIme());
+        email.setText(k.getEmail());
+        Picasso.get().load(k.getUri()).into(slika);
 
         return convertView;
 
