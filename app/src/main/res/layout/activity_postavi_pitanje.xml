@@ -97,8 +97,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/tezina_pitanja_izaberi"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintEnd_toStartOf="@+id/odgovor_b_edit_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" >
         <RadioButton
@@ -129,8 +128,7 @@
         android:id="@+id/tocan_odgovor_radio_group"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.9"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/odgovor_b_edit_text"
         app:layout_constraintTop_toTopOf="parent" >
         <RadioButton
             android:layout_width="wrap_content"
