@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fullscreen_content_controls"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="bottom|center_horizontal"
+    android:background="@color/white"
+    android:orientation="horizontal"
+    tools:ignore="UselessParent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0/0"
+        android:id="@+id/broj_tocnih_odgovora"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/pitanje"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:text="@string/dumy_question"
+        android:textSize="55px"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3"
+        tools:layout_editor_absoluteX="108dp"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/pitanje_odgovor_a"
+        android:layout_width="190dp"
+        android:layout_height="70dp"
+        android:layout_weight="1"
+        android:layout_marginRight="5dp"
+        android:background="@color/tipka_default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/pitanje_odgovor_b"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pitanje" />
+    <Button
+        android:id="@+id/pitanje_odgovor_b"
+        android:layout_width="190dp"
+        android:layout_height="70dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="5dp"
+        android:background="@color/tipka_default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/pitanje_odgovor_a"
+        app:layout_constraintTop_toBottomOf="@+id/pitanje" />
+
+    <Button
+        android:id="@+id/pitanje_odgovor_c"
+        android:layout_width="190dp"
+        android:layout_height="70dp"
+        android:layout_weight="1"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="25dp"
+        android:background="@color/tipka_default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/pitanje_odgovor_d"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pitanje_odgovor_a"
+        app:layout_constraintVertical_bias="0.25" />
+    <Button
+        android:id="@+id/pitanje_odgovor_d"
+        android:layout_width="190dp"
+        android:layout_height="70dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="25dp"
+        android:background="@color/tipka_default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/pitanje_odgovor_c"
+        app:layout_constraintTop_toBottomOf="@+id/pitanje_odgovor_b"
+        app:layout_constraintVertical_bias="0.25" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

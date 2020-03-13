@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "488289984405",
+    "firebase_url": "https://kvizomat-fffe0.firebaseio.com",
+    "project_id": "kvizomat-fffe0",
+    "storage_bucket": "kvizomat-fffe0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488289984405:android:d35dc5f731820f5f84209c",
+        "android_client_info": {
+          "package_name": "com.markojerkic.kvizomat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "488289984405-cklfqc3v1690kp0n7ud16iqkoreu0i38.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkkFSrgxmZYIFhYE05iR1QJe7h389U1uU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "488289984405-cklfqc3v1690kp0n7ud16iqkoreu0i38.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
