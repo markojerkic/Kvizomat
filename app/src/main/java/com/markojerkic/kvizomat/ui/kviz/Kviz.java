@@ -110,7 +110,7 @@ public class Kviz extends AppCompatActivity {
             trenutnoPitanje = mInfo.getNext();
             postaviPitanja(trenutnoPitanje);
             for (Button tipka: listaTipki) {
-                tipka.setBackgroundColor(getResources().getColor(R.color.tipka_default));
+                tipka.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 tipka.setClickable(true);
             }
             Log.e("kviz", "sljedeće pitanje se postavlja, iterator " + mInfo.getIterator());

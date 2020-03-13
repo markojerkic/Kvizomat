@@ -19,8 +19,11 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:background="@color/colorPrimary"
         app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer" >
+        app:menu="@menu/activity_main_drawer"
+        app:itemTextColor="@color/white"
+        app:itemIconTint="@color/white">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -34,6 +37,7 @@
                 android:paddingBottom="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
+                android:textColor="@color/white"
                 android:id="@+id/odjava"
                 android:text="Odjavite se"
                 android:textAlignment="center"
