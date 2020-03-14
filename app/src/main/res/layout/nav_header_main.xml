@@ -25,6 +25,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/user_name"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:fontFamily="@font/raleway_bold"
         android:text="@string/nav_header_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
@@ -32,6 +33,7 @@
         android:id="@+id/user_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/raleway_medium"
         android:text="@string/nav_header_subtitle" />
 
 </LinearLayout>

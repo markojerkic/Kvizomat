@@ -76,8 +76,14 @@ public class DodajPrijateljaFragment extends Fragment {
                     trKorisnikKey = dataSnapshot.getKey();
                     arrayAdapter = new ListAdapter(korisnici, getContext(), trKorisnik);
                     listaView.setAdapter(arrayAdapter);
+                    arrayAdapter.notifyDataSetChanged();
                 }
-                arrayAdapter.notifyDataSetChanged();
+                if (arrayAdapter != null) {
+                    Log.d("Prijatelji", "dodan " + kor.getIme());
+                    arrayAdapter.notifyDataSetChanged();
+                } else {
+                    Log.d("Prijatelji", "lista niej gotova " + kor.getEmail());
+                }
             }
 
             @Override

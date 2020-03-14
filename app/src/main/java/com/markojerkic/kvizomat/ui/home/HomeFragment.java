@@ -2,6 +2,7 @@ package com.markojerkic.kvizomat.ui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.PostaviPitanje;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
@@ -61,9 +63,13 @@ public class HomeFragment extends Fragment {
         mCategoryButton = root.findViewById(R.id.friendly_quitz_button);
         mBrojBodovaUkupni = root.findViewById(R.id.ukupan_br_bodova);
 
-        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (mFirebaseUser != null) {
+            mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        findKorisnik();
+            Log.d("Korisnik", mFirebaseUser.getDisplayName());
+
+            findKorisnik();
+        }
 
         decimalFormat = new DecimalFormat();
         decimalFormat.setMaximumFractionDigits(2);;
@@ -128,31 +134,29 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mFirebaseUser == null) {
+            mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            findKorisnik();
+        }
+    }
+
     private void findKorisnik() {
-        dbKorisnici.addChildEventListener(new ChildEventListener() {
+        dbKorisnici.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Korisnik k = dataSnapshot.getValue(Korisnik.class);
-                if (k.getUid().equals(mFirebaseUser.getUid())) {
-                    mKorisnik = k;
-                    korisnikKey = dataSnapshot.getKey();
-                    mBrojBodovaUkupni.setText(decimalFormat.format(mKorisnik.getBodovi()));
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    Korisnik k = ds.getValue(Korisnik.class);
+                    Log.d("Korisnik", k.getIme());
+                    if (k.getUid().equals(mFirebaseUser.getUid())) {
+                        mKorisnik = k;
+                        korisnikKey = dataSnapshot.getKey();
+                        mBrojBodovaUkupni.setText("Bodovi: " + decimalFormat.format(mKorisnik.getBodovi()));
+                    }
+
                 }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
             }
 
             @Override
@@ -160,6 +164,37 @@ public class HomeFragment extends Fragment {
 
             }
         });
+//        dbKorisnici.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//                Korisnik k = dataSnapshot.getValue(Korisnik.class);
+//                if (k.getUid().equals(mFirebaseUser.getUid())) {
+//                    mKorisnik = k;
+//                    korisnikKey = dataSnapshot.getKey();
+//                    mBrojBodovaUkupni.setText("Bodovi: " + decimalFormat.format(mKorisnik.getBodovi()));
+//                }
+//            }
+//
+//            @Override
+//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//            }
+//
+//            @Override
+//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 
     private ArrayList<Pitanje> randomPitanja (int brojPitanja) {

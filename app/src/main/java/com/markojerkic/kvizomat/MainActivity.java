@@ -26,11 +26,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
 
@@ -58,17 +58,6 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
 
-
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
-                .setDrawerLayout(drawer)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
-
         userName = navigationView.getHeaderView(0).findViewById(R.id.user_name);
         userEmail = navigationView.getHeaderView(0).findViewById(R.id.user_email);
         userPhoto = navigationView.getHeaderView(0).findViewById(R.id.user_photo);
@@ -90,6 +79,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
+                .setDrawerLayout(drawer)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
 
     }
 
@@ -122,43 +121,65 @@ public class MainActivity extends AppCompatActivity {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
                 mUser = FirebaseAuth.getInstance().getCurrentUser();final ArrayList<Korisnik> korisnici = new ArrayList<>();
-                DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisnici");
+                final DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisnici");
+                 db.addListenerForSingleValueEvent(new ValueEventListener() {
+                     @Override
+                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                         for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                             korisnici.add(ds.getValue(Korisnik.class));
+                         }
+                         ArrayList<String> pr = new ArrayList<>();
+                         pr.add("prvVr");
+                         Korisnik upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
+                                 mUser.getPhotoUrl().toString(), mUser.getUid(), pr, 0.f);
+                         Log.d("Korisnik", "Postojim");
 
-                db.addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                        korisnici.add(dataSnapshot.getValue(Korisnik.class));
-                    }
+                         if (!korisnici.contains(upKor)) {
+                             db.push().setValue(upKor);
+                         }
+                         updateUI();
+                     }
 
-                    @Override
-                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                     @Override
+                     public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-
-                    @Override
-                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-                ArrayList<String> pr = new ArrayList<>();
-                pr.add("prvVr");
-                Korisnik upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
-                        mUser.getPhotoUrl().toString(), mUser.getUid(), pr, 0.f);
-
-                if (!korisnici.contains(upKor)) {
-                    db.push().setValue(upKor);
-                }
-                updateUI();
+                     }
+                 });
+//                db.addChildEventListener(new ChildEventListener() {
+//                    @Override
+//                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//                        korisnici.add(dataSnapshot.getValue(Korisnik.class));
+//                    }
+//
+//                    @Override
+//                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                    }
+//                });
+//                ArrayList<String> pr = new ArrayList<>();
+//                pr.add("prvVr");
+//                Korisnik upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
+//                        mUser.getPhotoUrl().toString(), mUser.getUid(), pr, 0.f);
+//
+//                if (!korisnici.contains(upKor)) {
+//                    db.push().setValue(upKor);
+//                }
+//                updateUI();
             } else {
                 int errorCode = response.getError().getErrorCode();
                 Log.e("Kviz", "signin greška " + errorCode);
