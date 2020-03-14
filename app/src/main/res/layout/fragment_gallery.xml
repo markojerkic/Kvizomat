@@ -12,5 +12,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:divider="@color/white"
         android:id="@+id/lista_korisnika_view"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

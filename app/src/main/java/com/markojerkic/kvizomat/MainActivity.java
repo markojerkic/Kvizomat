@@ -150,11 +150,11 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
-                for (Korisnik k: korisnici) {
-                    Log.d("Korisnik", k.getIme());
-                }
+                ArrayList<String> pr = new ArrayList<>();
+                pr.add("prvVr");
                 Korisnik upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
-                        mUser.getPhotoUrl().toString(), mUser.getUid());
+                        mUser.getPhotoUrl().toString(), mUser.getUid(), pr, 0.f);
+
                 if (!korisnici.contains(upKor)) {
                     db.push().setValue(upKor);
                 }
@@ -163,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
                 int errorCode = response.getError().getErrorCode();
                 Log.e("Kviz", "signin greška " + errorCode);
             }
+
         }
     }
 
