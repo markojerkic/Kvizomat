@@ -15,12 +15,12 @@
     <fragment
         android:id="@+id/nav_gallery"
         android:name="com.markojerkic.kvizomat.ui.listaKorisnika.DodajPrijateljaFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/dodaj_prijatelja" />
+        android:label="@string/menu_dodaj_prijatelje"
+        tools:layout="@layout/fragment_dodaj_prijatelja" />
 
     <fragment
         android:id="@+id/nav_slideshow"
         android:name="com.markojerkic.kvizomat.ui.mojiPrijatelji.MojiPrijateljiFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/moji_prijatelji" />
+        tools:layout="@layout/fragment_moji_prijatelji" />
 </navigation>

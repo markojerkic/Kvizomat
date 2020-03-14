@@ -1,6 +1,7 @@
-package com.markojerkic.kvizomat.ui.listaKorisnika;
+package com.markojerkic.kvizomat.ui;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +19,12 @@ public class ListAdapter extends BaseAdapter {
 
     private ArrayList<Korisnik> korisnici;
     private Context context;
+    private Korisnik trKor;
 
-    ListAdapter(ArrayList<Korisnik> korisnici, Context context) {
+    public ListAdapter(ArrayList<Korisnik> korisnici, Context context, Korisnik trKor) {
         this.korisnici = korisnici;
         this.context = context;
+        this.trKor = trKor;
     }
 
     @Override
@@ -51,8 +54,15 @@ public class ListAdapter extends BaseAdapter {
         ImageView slika = convertView.findViewById(R.id.slika_korisnik_list);
         TextView ime = convertView.findViewById(R.id.ime_korisnika_list);
         TextView email = convertView.findViewById(R.id.email_korisnika_list);
+        TextView medjuPrijeateljima = convertView.findViewById(R.id.prijatelj_ili_ne);
 
         ime.setText(k.getIme());
+        Log.d("prijatelj", String.valueOf(trKor.getPrijatelji().contains(k.getUid())));
+        if (trKor.getPrijatelji().contains(k.getUid())) {
+            medjuPrijeateljima.setText("Moj prijatelj");
+        } else {
+            medjuPrijeateljima.setText("Ne poznajem ga");
+        }
         email.setText(k.getEmail());
         Picasso.get().load(k.getUri()).into(slika);
 

@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.markojerkic.kvizomat.R;
+import com.markojerkic.kvizomat.ui.ListAdapter;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
 
@@ -43,13 +44,14 @@ public class DodajPrijateljaFragment extends Fragment {
     private ListView listaView;
     private ListAdapter arrayAdapter;
     private Korisnik trKorisnik;
+    private String trKorisnikKey;
 
     private Dialog dialog;
     
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         dodajPrijateljaViewModel = ViewModelProviders.of(this).get(DodajPrijateljaViewModel.class);
-        final View root = inflater.inflate(R.layout.dodaj_prijatelja, container, false);
+        final View root = inflater.inflate(R.layout.fragment_dodaj_prijatelja, container, false);
 
         korisnici = new ArrayList<>();
         korisniciKey = new ArrayList<>();
@@ -58,8 +60,6 @@ public class DodajPrijateljaFragment extends Fragment {
         final FirebaseUser trUsr = FirebaseAuth.getInstance().getCurrentUser();
 
         listaView = root.findViewById(R.id.lista_korisnika_view);
-        arrayAdapter = new ListAdapter(korisnici, getContext());
-        listaView.setAdapter(arrayAdapter);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -71,11 +71,11 @@ public class DodajPrijateljaFragment extends Fragment {
                     korisnici.add(kor);
                     korisniciKey.add(dataSnapshot.getKey());
                     Log.d("korisnici", kor.getUid());
-                    for (String key: korisniciKey) {
-                        Log.d("Key", key);
-                    }
                 } else {
                     trKorisnik = kor;
+                    trKorisnikKey = dataSnapshot.getKey();
+                    arrayAdapter = new ListAdapter(korisnici, getContext(), trKorisnik);
+                    listaView.setAdapter(arrayAdapter);
                 }
                 arrayAdapter.notifyDataSetChanged();
             }
@@ -108,6 +108,7 @@ public class DodajPrijateljaFragment extends Fragment {
                 final Korisnik izabraniKor = korisnici.get(position);
 
                 Log.d("korisnik", izabraniKor.getIme());
+                final View thisV = view;
 
                 dialog.setContentView(R.layout.popup_korisnik);
 
@@ -123,13 +124,18 @@ public class DodajPrijateljaFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         ArrayList<String> prijatelji = trKorisnik.getPrijatelji();
-                        for(String p: prijatelji) {
-                            Log.d("prij", p);
+                        Log.d("Korisnik", izabraniKor.getIme());
+                        for (String prtr: prijatelji) {
+                            Log.d("Korisnik prijatelj", prtr);
                         }
+                        Log.d("Korisnik", String.valueOf(prijatelji.contains(izabraniKor.getUid())));
                         if (!prijatelji.contains(izabraniKor.getUid())) {
                             prijatelji.add(izabraniKor.getUid());
-                            Log.d("Korisnik", izabraniKor.getIme());
-                            db.child(korisniciKey.get(position)).child("prijatelji").setValue(prijatelji);
+                            Log.d("Korisnik key", korisniciKey.get(position));
+                            db.child(trKorisnikKey).child("prijatelji").setValue(prijatelji);
+                            TextView prijateljText = thisV.findViewById(R.id.prijatelj_ili_ne);
+                            prijateljText.setText("Moj prijatelj");
+                            dialog.cancel();
                         }
                     }
                 });
