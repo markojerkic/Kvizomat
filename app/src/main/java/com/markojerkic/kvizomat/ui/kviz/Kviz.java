@@ -10,7 +10,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.markojerkic.kvizomat.R;
+
+import java.text.DecimalFormat;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -20,16 +24,24 @@ public class Kviz extends AppCompatActivity {
 
     private TextView mPitanje;
     private TextView mTocniOdgovoriText;
+    private TextView bodoviText;
     private Button mOdgovorA;
     private Button mOdgovorB;
     private Button mOdgovorC;
     private Button mOdgovorD;
     private Button[] listaTipki;
     private int brojTocnihOdgovora = 0;
+    private float bodovi = 0.f;
+
+    private DecimalFormat decimalFormat;
+
+    private DatabaseReference dbKorisnici = FirebaseDatabase.getInstance().getReference("korisnici");
 
     private KvizInformacije mInfo;
 
     private Pitanje trenutnoPitanje;
+    private Korisnik mKorisnik;
+    private String mKorisnikKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +52,19 @@ public class Kviz extends AppCompatActivity {
         // Pronađi komponente kviza
         mPitanje = findViewById(R.id.pitanje);
         mTocniOdgovoriText = findViewById(R.id.broj_tocnih_odgovora);
+        bodoviText = findViewById(R.id.bodovi_trenutni);
         mOdgovorA = findViewById(R.id.pitanje_odgovor_a);
         mOdgovorB = findViewById(R.id.pitanje_odgovor_b);
         mOdgovorC = findViewById(R.id.pitanje_odgovor_c);
         mOdgovorD = findViewById(R.id.pitanje_odgovor_d);
         listaTipki = new Button[]{mOdgovorA, mOdgovorB, mOdgovorC, mOdgovorD};
 
+        decimalFormat = new DecimalFormat();
+        decimalFormat.setMaximumFractionDigits(2);
+
         mInfo = (KvizInformacije) getIntent().getSerializableExtra("pitanja");
+        mKorisnik = (Korisnik) getIntent().getSerializableExtra("korisnik");
+        mKorisnikKey = (String) getIntent().getSerializableExtra("korisnikKey");
         trenutnoPitanje = mInfo.getNext();
 
         postaviPitanja(trenutnoPitanje);
@@ -88,10 +106,15 @@ public class Kviz extends AppCompatActivity {
         if (pitanje.getTocanOdgovor() == tipkaOdgovorBroj) {
             postaviTocno(pitanje, tipka);
             brojTocnihOdgovora++;
-            mTocniOdgovoriText.setText(brojTocnihOdgovora + "/" + mInfo.getIterator());
         } else {
             postaviNetocno(pitanje, tipka);
-            mTocniOdgovoriText.setText(brojTocnihOdgovora + "/" + mInfo.getIterator());
+        }
+        mTocniOdgovoriText.setText("Točni odgovori: " +
+                brojTocnihOdgovora + "/" + mInfo.getIterator());
+        if (mInfo.getIterator() % 3 == 0) {
+            bodovi += ((float) brojTocnihOdgovora / (float) mInfo.getIterator())
+                    * (float) pitanje.getTezinaPitanja();
+            bodoviText.setText("Bodovi: " + decimalFormat.format(bodovi));
         }
         for (Button button: listaTipki) {
             button.setClickable(false);
@@ -127,6 +150,8 @@ public class Kviz extends AppCompatActivity {
 
     private void zatvoriAktivnost() {
         Toast.makeText(getApplicationContext(), "Doviđenja", Toast.LENGTH_SHORT).show();
+        mKorisnik.setBodovi(mKorisnik.getBodovi() + bodovi);
+        dbKorisnici.child(mKorisnikKey).child("bodovi").setValue(mKorisnik.getBodovi() + bodovi);
         this.finish();
     }
 

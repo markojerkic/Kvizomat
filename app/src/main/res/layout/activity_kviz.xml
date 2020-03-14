@@ -15,13 +15,24 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0/0"
+        android:text="Točni odgovori: 0/0"
         android:textColor="@color/white"
         android:id="@+id/broj_tocnih_odgovora"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bodovi: 0.0"
+        android:textColor="@color/white"
+        android:id="@+id/bodovi_trenutni"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"/>
 
     <TextView
         android:id="@+id/pitanje"

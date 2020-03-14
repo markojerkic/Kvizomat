@@ -4,8 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="25dp"
     android:background="@color/colorPrimary"
     tools:context=".ui.home.HomeFragment">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/ukupan_br_bodova"
+        android:text="Tvoji bodovi: 0.0"/>
 
     <Button
         android:id="@+id/last_man_button"
