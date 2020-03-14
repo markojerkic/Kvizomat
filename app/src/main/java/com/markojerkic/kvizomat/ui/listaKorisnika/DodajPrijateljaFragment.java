@@ -1,4 +1,4 @@
-package com.markojerkic.kvizomat.ui.gallery;
+package com.markojerkic.kvizomat.ui.listaKorisnika;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -30,11 +30,11 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class GalleryFragment extends Fragment {
+public class DodajPrijateljaFragment extends Fragment {
 
     FirebaseUser user;
 
-    private GalleryViewModel galleryViewModel;
+    private DodajPrijateljaViewModel dodajPrijateljaViewModel;
 
     private ArrayList<Korisnik> korisnici;
     ArrayList<String> korisniciKey;
@@ -48,8 +48,8 @@ public class GalleryFragment extends Fragment {
     
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        galleryViewModel = ViewModelProviders.of(this).get(GalleryViewModel.class);
-        final View root = inflater.inflate(R.layout.fragment_gallery, container, false);
+        dodajPrijateljaViewModel = ViewModelProviders.of(this).get(DodajPrijateljaViewModel.class);
+        final View root = inflater.inflate(R.layout.dodaj_prijatelja, container, false);
 
         korisnici = new ArrayList<>();
         korisniciKey = new ArrayList<>();

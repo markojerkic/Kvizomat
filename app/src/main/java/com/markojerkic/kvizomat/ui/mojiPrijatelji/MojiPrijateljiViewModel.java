@@ -1,14 +1,14 @@
-package com.markojerkic.kvizomat.ui.slideshow;
+package com.markojerkic.kvizomat.ui.mojiPrijatelji;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class SlideshowViewModel extends ViewModel {
+public class MojiPrijateljiViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public SlideshowViewModel() {
+    public MojiPrijateljiViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is slideshow fragment");
     }

@@ -1,4 +1,4 @@
-package com.markojerkic.kvizomat.ui.slideshow;
+package com.markojerkic.kvizomat.ui.mojiPrijatelji;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.markojerkic.kvizomat.R;
 
-public class SlideshowFragment extends Fragment {
+public class MojiPrijateljiFragment extends Fragment {
 
-    private SlideshowViewModel slideshowViewModel;
+    private MojiPrijateljiViewModel mojiPrijateljiViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        slideshowViewModel =
-                ViewModelProviders.of(this).get(SlideshowViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_slideshow, container, false);
+        mojiPrijateljiViewModel =
+                ViewModelProviders.of(this).get(MojiPrijateljiViewModel.class);
+        View root = inflater.inflate(R.layout.moji_prijatelji, container, false);
         final TextView textView = root.findViewById(R.id.text_slideshow);
-        slideshowViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        mojiPrijateljiViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

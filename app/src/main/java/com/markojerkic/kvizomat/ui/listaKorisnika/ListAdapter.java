@@ -1,4 +1,4 @@
-package com.markojerkic.kvizomat.ui.gallery;
+package com.markojerkic.kvizomat.ui.listaKorisnika;
 
 import android.content.Context;
 import android.view.LayoutInflater;
