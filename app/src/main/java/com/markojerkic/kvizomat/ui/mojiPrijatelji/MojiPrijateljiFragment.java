@@ -25,7 +25,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.markojerkic.kvizomat.R;
-import com.markojerkic.kvizomat.ui.ListAdapter;
+import com.markojerkic.kvizomat.ui.ListaKorisnikaAdapter;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
 
@@ -41,7 +41,7 @@ public class MojiPrijateljiFragment extends Fragment {
     private DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisnici");
 
     private ListView listaView;
-    private ListAdapter arrayAdapter;
+    private ListaKorisnikaAdapter arrayAdapter;
     private Korisnik trKorisnik;
 
     private Dialog dialog;
@@ -57,7 +57,7 @@ public class MojiPrijateljiFragment extends Fragment {
 
         final FirebaseUser trUsr = FirebaseAuth.getInstance().getCurrentUser();
 
-        listaView = root.findViewById(R.id.lista_mojih_prijatelja);
+        listaView = root.findViewById(R.id.lista_mojih_prijatelja_list_view);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -72,7 +72,7 @@ public class MojiPrijateljiFragment extends Fragment {
                     }
                 } else {
                     trKorisnik = kor;
-                    arrayAdapter = new ListAdapter(korisnici, getContext(), trKorisnik);
+                    arrayAdapter = new ListaKorisnikaAdapter(korisnici, getContext(), trKorisnik);
                     listaView.setAdapter(arrayAdapter);
                 }
                 arrayAdapter.notifyDataSetChanged();

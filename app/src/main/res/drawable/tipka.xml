@@ -2,10 +2,9 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true" >
         <shape android:shape="rectangle"
-            android:tint="@color/colorPrimaryDark" >
-            <corners android:radius="3dip" />
+            android:tint="@color/colorAccent" >
+            <corners android:radius="30dip" />
             <stroke android:width="1dip" android:color="@color/white"/>
-<!--            <gradient android:angle="-90" android:startColor="@color/colorPrimaryDark" android:endColor="@color/colorPrimary"/>-->
         </shape>
     </item>
     <item android:state_focused="true"
@@ -14,6 +13,7 @@
             <corners android:radius="30dip" />
             <stroke android:width="1dip" android:color="@color/white" />
             <solid android:color="@color/colorPrimaryDark"/>
+<!--            <gradient android:angle="-90" android:startColor="@color/colorPrimaryDark" android:endColor="@color/white"/>-->
         </shape>
     </item>
     <item >
@@ -21,7 +21,6 @@
             android:tint="@color/colorPrimaryDark">
             <corners android:radius="30dip" />
             <stroke android:width="1dip" android:color="@color/white" />
-<!--            <gradient android:angle="-90" android:startColor="@color/colorAccent" android:endColor="#58857e" />-->
         </shape>
     </item>
 </selector>

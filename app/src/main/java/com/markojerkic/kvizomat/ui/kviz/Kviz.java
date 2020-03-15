@@ -33,6 +33,8 @@ public class Kviz extends AppCompatActivity {
     private int brojTocnihOdgovora = 0;
     private float bodovi = 0.f;
 
+    private long backPressed;
+
     private DecimalFormat decimalFormat;
 
     private DatabaseReference dbKorisnici = FirebaseDatabase.getInstance().getReference("korisnici");
@@ -72,6 +74,20 @@ public class Kviz extends AppCompatActivity {
 
 
     }
+
+    @Override
+    public void onBackPressed() {
+        int timeInterval = 2000;
+
+        if(backPressed + timeInterval > System.currentTimeMillis()) {
+            super.onBackPressed();
+        } else {
+            Toast.makeText(getApplicationContext(), "Kliknite nazad dva puta da izdađete",
+                    Toast.LENGTH_SHORT).show();
+        }
+        backPressed = System.currentTimeMillis();
+    }
+
     private boolean provjeriKliknutOdgovor(final Pitanje pitanje) {
         mOdgovorA.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -15,26 +15,26 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class ListAdapter extends BaseAdapter {
+public class RangListaPrijateljaAdapter extends BaseAdapter {
 
-    private ArrayList<Korisnik> korisnici;
+    private ArrayList<Korisnik> prijatelji;
     private Context context;
     private Korisnik trKor;
 
-    public ListAdapter(ArrayList<Korisnik> korisnici, Context context, Korisnik trKor) {
-        this.korisnici = korisnici;
+    public RangListaPrijateljaAdapter(ArrayList<Korisnik> prijatelji, Context context, Korisnik korisnik) {
         this.context = context;
-        this.trKor = trKor;
+        this.prijatelji = prijatelji;
+        this.trKor = korisnik;
     }
 
     @Override
     public int getCount() {
-        return korisnici.size();
+        return prijatelji.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return korisnici.get(position);
+        return prijatelji.get(position);
     }
 
     @Override
@@ -46,27 +46,26 @@ public class ListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             convertView = LayoutInflater.from(context)
-                    .inflate(R.layout.korisnik_jedan, parent, false);
+                    .inflate(R.layout.korisnik_leaderboard, parent, false);
         }
 
         Korisnik k = (Korisnik) getItem(position);
 
-        ImageView slika = convertView.findViewById(R.id.slika_korisnik_list);
-        TextView ime = convertView.findViewById(R.id.ime_korisnika_list);
-        TextView email = convertView.findViewById(R.id.email_korisnika_list);
-        TextView medjuPrijeateljima = convertView.findViewById(R.id.prijatelj_ili_ne);
+        ImageView slika = convertView.findViewById(R.id.slika_korisnik_list_leaderboard);
+        TextView ime = convertView.findViewById(R.id.ime_korisnika_list_leaderboard);
+        TextView email = convertView.findViewById(R.id.email_korisnika_list_leaderboard);
+        TextView brojBodova = convertView.findViewById(R.id.broj_bodova_rang);
+        TextView rang = convertView.findViewById(R.id.leaderboard_rang);
 
         ime.setText(k.getIme());
+        rang.setText("#" + String.valueOf(position+1));
         Log.d("prijatelj", String.valueOf(trKor.getPrijatelji().contains(k.getUid())));
-        if (trKor.getPrijatelji().contains(k.getUid())) {
-            medjuPrijeateljima.setText("Moj prijatelj");
-        } else {
-            medjuPrijeateljima.setText("Ne poznajem ga");
-        }
+
+        brojBodova.setText("Broj bodova: " + k.getBodovi());
+
         email.setText(k.getEmail());
         Picasso.get().load(k.getUri()).into(slika);
 
         return convertView;
-
     }
 }

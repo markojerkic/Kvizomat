@@ -13,5 +13,5 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:divider="@color/white"
-        android:id="@+id/lista_mojih_prijatelja"/>
+        android:id="@+id/lista_mojih_prijatelja_list_view"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

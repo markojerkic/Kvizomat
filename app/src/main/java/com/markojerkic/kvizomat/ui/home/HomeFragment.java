@@ -83,6 +83,7 @@ public class HomeFragment extends Fragment {
                     mListaPitanja.add(pitanje);
                 }
 //                findKorisnik();
+                setOnClick();
             }
 
             @Override
@@ -121,6 +122,11 @@ public class HomeFragment extends Fragment {
 //        mRefPitanja.addChildEventListener(childEventListener);
 
         // Set on-click listeners
+
+        return root;
+    }
+
+    public void setOnClick() {
         mLastManButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,8 +140,7 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
             }
         });
-        mCategoryButton.setClickable(false);
-        mCategoryButton.setVisibility(View.INVISIBLE);
+
         mCategoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -144,8 +149,6 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getActivity(), "Ajmo napraviti par pitanja!!!", Toast.LENGTH_SHORT).show();
             }
         });
-
-        return root;
     }
 
     @Override

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -25,11 +26,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.markojerkic.kvizomat.R;
-import com.markojerkic.kvizomat.ui.ListAdapter;
+import com.markojerkic.kvizomat.ui.ListaKorisnikaAdapter;
+import com.markojerkic.kvizomat.ui.RangListaPrijateljaAdapter;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class DodajPrijateljaFragment extends Fragment {
 
@@ -42,13 +46,18 @@ public class DodajPrijateljaFragment extends Fragment {
     private DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisnici");
 
     private ListView listaView;
-    private ListAdapter arrayAdapter;
+    private ListaKorisnikaAdapter listaKorisnikaAdapter;
+    private RangListaPrijateljaAdapter rangListaPrijateljaAdapter;
     private Korisnik trKorisnik;
     private String trKorisnikKey;
 
+    private TextView korisniciListaTextView;
+    private TextView mojiPrijateljiListaTextView;
+
     private TextView prijateljIliNeText;
 
-    private ArrayList<String> prijatelji;
+    private ArrayList<String> prijateljiString;
+    private ArrayList<Korisnik> prijateljiKorisnik;
 
     private Dialog dialog;
     
@@ -59,11 +68,33 @@ public class DodajPrijateljaFragment extends Fragment {
 
         korisnici = new ArrayList<>();
         korisniciKey = new ArrayList<>();
+        prijateljiKorisnik = new ArrayList<>();
         dialog = new Dialog(getContext());
 
         final FirebaseUser trUsr = FirebaseAuth.getInstance().getCurrentUser();
 
         listaView = root.findViewById(R.id.lista_korisnika_view);
+        korisniciListaTextView = root.findViewById(R.id.lista_korisnici_text);
+        mojiPrijateljiListaTextView = root.findViewById(R.id.lista_moji_prijatelji_text);
+
+        korisniciListaTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                korisniciListaTextView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.raleway_bold));
+                mojiPrijateljiListaTextView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.raleway_medium));
+                listaView.setAdapter(listaKorisnikaAdapter);
+                listaKorisnikaAdapter.notifyDataSetChanged();
+            }
+        });
+        mojiPrijateljiListaTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                korisniciListaTextView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.raleway_medium));
+                mojiPrijateljiListaTextView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.raleway_bold));
+                listaView.setAdapter(rangListaPrijateljaAdapter);
+                rangListaPrijateljaAdapter.notifyDataSetChanged();
+            }
+        });
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -79,19 +110,21 @@ public class DodajPrijateljaFragment extends Fragment {
                     } else {
                         trKorisnik = kor;
                         trKorisnikKey = ds.getKey();
-                        prijatelji = trKorisnik.getPrijatelji();
+                        prijateljiString = trKorisnik.getPrijatelji();
 
-                        arrayAdapter = new ListAdapter(korisnici, getContext(), trKorisnik);
-                        listaView.setAdapter(arrayAdapter);
-                        arrayAdapter.notifyDataSetChanged();
+                        listaKorisnikaAdapter = new ListaKorisnikaAdapter(korisnici, getContext(), trKorisnik);
+                        listaView.setAdapter(listaKorisnikaAdapter);
+                        listaKorisnikaAdapter.notifyDataSetChanged();
                     }
-                    if (arrayAdapter != null) {
+                    if (listaKorisnikaAdapter != null) {
                         Log.d("Prijatelji", "dodan " + kor.getIme());
-                        arrayAdapter.notifyDataSetChanged();
+                        listaKorisnikaAdapter.notifyDataSetChanged();
                     } else {
                         Log.d("Prijatelji", "lista niej gotova " + kor.getEmail());
                     }
                 }
+                napraviListuPrijatelja();
+
             }
 
             @Override
@@ -99,49 +132,6 @@ public class DodajPrijateljaFragment extends Fragment {
 
             }
         });
-//        db.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                Korisnik kor = dataSnapshot.getValue(Korisnik.class);
-//                if (kor.getUid().compareTo(trUsr.getUid()) != 0) {
-//                    korisnici.add(kor);
-//                    korisniciKey.add(dataSnapshot.getKey());
-//                    Log.d("korisnici", kor.getUid());
-//                } else {
-//                    trKorisnik = kor;
-//                    trKorisnikKey = dataSnapshot.getKey();
-//                    arrayAdapter = new ListAdapter(korisnici, getContext(), trKorisnik);
-//                    listaView.setAdapter(arrayAdapter);
-//                    arrayAdapter.notifyDataSetChanged();
-//                }
-//                if (arrayAdapter != null) {
-//                    Log.d("Prijatelji", "dodan " + kor.getIme());
-//                    arrayAdapter.notifyDataSetChanged();
-//                } else {
-//                    Log.d("Prijatelji", "lista niej gotova " + kor.getEmail());
-//                }
-//            }
-//
-//            @Override
-//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
 
         listaView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -160,7 +150,7 @@ public class DodajPrijateljaFragment extends Fragment {
                 Button dodaj = dialog.findViewById(R.id.dodaj_prijatelja);
                 Button odustani = dialog.findViewById(R.id.odustani_prijatelj);
 
-                if (prijatelji.contains(izabraniKor.getUid())) {
+                if (prijateljiString.contains(izabraniKor.getUid())) {
                     dodaj.setText("Izbriši prijatelja");
                 } else
                     dodaj.setText("Dodaj prijatelja");
@@ -171,23 +161,26 @@ public class DodajPrijateljaFragment extends Fragment {
                 dodaj.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.d("Korisnik", String.valueOf(prijatelji.contains(izabraniKor.getUid())));
-                        if (!prijatelji.contains(izabraniKor.getUid())) {
-                            prijatelji.add(izabraniKor.getUid());
+                        Log.d("Korisnik", String.valueOf(prijateljiString.contains(izabraniKor.getUid())));
+                        if (!prijateljiString.contains(izabraniKor.getUid())) {
+                            prijateljiString.add(izabraniKor.getUid());
+                            prijateljiKorisnik.add(izabraniKor);
                             Log.d("Korisnik key", korisniciKey.get(position));
 
-                            db.child(trKorisnikKey).child("prijatelji").setValue(prijatelji);
+                            db.child(trKorisnikKey).child("prijatelji").setValue(prijateljiString);
                             prijateljIliNeText.setText("Moj prijatelj");
                             Toast.makeText(getContext(), izabraniKor.getIme() +
                                     " dodan u prijatelje", Toast.LENGTH_SHORT).show();
 
                         } else {
-                            prijatelji.remove(izabraniKor.getUid());
-                            db.child(trKorisnikKey).child("prijatelji").setValue(prijatelji);
+                            prijateljiString.remove(izabraniKor.getUid());
+                            prijateljiKorisnik.remove(izabraniKor);
+                            db.child(trKorisnikKey).child("prijatelji").setValue(prijateljiString);
                             prijateljIliNeText.setText("Ne poznajem ga");
                             Toast.makeText(getContext(), izabraniKor.getIme() +
                                     " izbrisan iz prijatelja", Toast.LENGTH_SHORT).show();
                         }
+                        napraviListuPrijatelja();
 
                         dialog.cancel();
                     }
@@ -204,5 +197,28 @@ public class DodajPrijateljaFragment extends Fragment {
             }
         });
         return root;
+    }
+
+    public void napraviListuPrijatelja() {
+        for (Korisnik kP: korisnici) {
+            if (prijateljiString.contains(kP.getUid())) {
+                prijateljiKorisnik.add(kP);
+            }
+        }
+        Collections.sort(prijateljiKorisnik, new Comparator<Korisnik>() {
+            @Override
+            public int compare(Korisnik o1, Korisnik o2) {
+                if (o1.getBodovi() > o2.getBodovi())
+                    return 1;
+                if (o1.getBodovi() < o2.getBodovi())
+                    return -1;
+                return 0;
+            }
+        });
+        if (rangListaPrijateljaAdapter == null) {
+            rangListaPrijateljaAdapter = new RangListaPrijateljaAdapter(prijateljiKorisnik,
+                    getContext(), trKorisnik);
+        }
+        rangListaPrijateljaAdapter.notifyDataSetChanged();
     }
 }
