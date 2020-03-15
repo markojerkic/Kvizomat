@@ -1,5 +1,6 @@
 package com.markojerkic.kvizomat;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView userEmail;
     private ImageView userPhoto;
     private TextView odjavaView;
+    private Dialog infoDialog;
 
     private Korisnik upKor;
     final DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisnici");
@@ -67,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
         userEmail = navigationView.getHeaderView(0).findViewById(R.id.user_email);
         userPhoto = navigationView.getHeaderView(0).findViewById(R.id.user_photo);
         odjavaView = navigationView.findViewById(R.id.odjava);
+
+        infoDialog = new Dialog(this);
+        infoDialog.setContentView(R.layout.info_o_nama);
 
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             Log.d("auth", "nema usera");
@@ -138,11 +142,14 @@ public class MainActivity extends AppCompatActivity {
                          }
                          ArrayList<String> pr = new ArrayList<>();
                          pr.add("prvVr");
-                         Log.d("Korisnik", "Postojim");
+                         Log.d("Korisnik", mUser.getDisplayName());
+                         Log.d("Korisnik", mUser.getUid());
+                         Log.d("Korisnik", String.valueOf(mUser.getPhotoUrl()));
 
                          if (!korUID.contains(mUser.getUid())) {
                              upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
-                                     mUser.getPhotoUrl().toString(), mUser.getUid(), pr, 0.f);
+                                     mUser.getPhotoUrl().toString(),
+                                     mUser.getUid(), pr, 0.f);
                              db.push().setValue(upKor);
                          } else {
                              float bod = korisnici.get(korUID.indexOf(mUser.getUid())).getBodovi();
@@ -158,8 +165,9 @@ public class MainActivity extends AppCompatActivity {
                      }
                  });
             } else {
-                int errorCode = response.getError().getErrorCode();
-                Log.e("Kviz", "signin greška " + errorCode);
+                createSignInIntent();
+//                int errorCode = response.getError().getErrorCode();
+//                Log.e("Kviz", "signin greška " + errorCode);
             }
 
         }
@@ -168,12 +176,15 @@ public class MainActivity extends AppCompatActivity {
     public void createSignInIntent() {
         // Firebase login
         List<AuthUI.IdpConfig> providers = Arrays.asList(
-//                new AuthUI.IdpConfig.FacebookBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build()
+                new AuthUI.IdpConfig.GoogleBuilder().build(),
+                new AuthUI.IdpConfig.FacebookBuilder().build()
         );
 
-        startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
-                .setAvailableProviders(providers).build(), RC_SIGN_IN);
+        startActivityForResult(AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .setLogo(R.mipmap.ic_launcher)
+                .build(), RC_SIGN_IN);
     }
 
     @Override
@@ -187,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.info:
-                Toast.makeText(getApplicationContext(), "Test", Toast.LENGTH_SHORT).show();
+                infoDialog.show();
                 return true;
         }
         return super.onOptionsItemSelected(item);

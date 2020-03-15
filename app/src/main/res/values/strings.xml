@@ -7,6 +7,9 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="info">Informacije o nama</string>
 
+    <string name="facebook_application_id" translatable="false">824749304660612</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb9cf8b05672881ea0535c319c614f2db3</string>
+
     <string name="menu_home">Igraj</string>
     <string name="menu_dodaj_prijatelje">Dodaj prijatelje</string>
     <string name="menu_slideshow">Slideshow</string>

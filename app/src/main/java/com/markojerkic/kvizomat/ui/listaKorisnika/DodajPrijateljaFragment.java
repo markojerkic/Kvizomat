@@ -54,6 +54,8 @@ public class DodajPrijateljaFragment extends Fragment {
     private TextView korisniciListaTextView;
     private TextView mojiPrijateljiListaTextView;
 
+    private boolean svi = true;
+
     private TextView prijateljIliNeText;
 
     private ArrayList<String> prijateljiString;
@@ -80,6 +82,7 @@ public class DodajPrijateljaFragment extends Fragment {
         korisniciListaTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                svi = true;
                 korisniciListaTextView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.raleway_bold));
                 mojiPrijateljiListaTextView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.raleway_medium));
                 listaView.setAdapter(listaKorisnikaAdapter);
@@ -89,6 +92,8 @@ public class DodajPrijateljaFragment extends Fragment {
         mojiPrijateljiListaTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                svi = false;
+                napraviListuPrijatelja();
                 korisniciListaTextView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.raleway_medium));
                 mojiPrijateljiListaTextView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.raleway_bold));
                 listaView.setAdapter(rangListaPrijateljaAdapter);
@@ -141,7 +146,7 @@ public class DodajPrijateljaFragment extends Fragment {
 
                 Log.d("korisnik", izabraniKor.getIme());
                 final View thisV = view;
-                 prijateljIliNeText = thisV.findViewById(R.id.prijatelj_ili_ne);
+                prijateljIliNeText = thisV.findViewById(R.id.prijatelj_ili_ne);
 
                 dialog.setContentView(R.layout.popup_korisnik);
 
@@ -168,7 +173,9 @@ public class DodajPrijateljaFragment extends Fragment {
                             Log.d("Korisnik key", korisniciKey.get(position));
 
                             db.child(trKorisnikKey).child("prijatelji").setValue(prijateljiString);
-                            prijateljIliNeText.setText("Moj prijatelj");
+                            if (svi)
+                                prijateljIliNeText.setText("Moj prijatelj");
+                            napraviListuPrijatelja();
                             Toast.makeText(getContext(), izabraniKor.getIme() +
                                     " dodan u prijatelje", Toast.LENGTH_SHORT).show();
 
@@ -176,11 +183,12 @@ public class DodajPrijateljaFragment extends Fragment {
                             prijateljiString.remove(izabraniKor.getUid());
                             prijateljiKorisnik.remove(izabraniKor);
                             db.child(trKorisnikKey).child("prijatelji").setValue(prijateljiString);
-                            prijateljIliNeText.setText("Ne poznajem ga");
+                            if (svi)
+                                prijateljIliNeText.setText("Ne poznajem ga");
+                            napraviListuPrijatelja();
                             Toast.makeText(getContext(), izabraniKor.getIme() +
                                     " izbrisan iz prijatelja", Toast.LENGTH_SHORT).show();
                         }
-                        napraviListuPrijatelja();
 
                         dialog.cancel();
                     }
@@ -200,6 +208,7 @@ public class DodajPrijateljaFragment extends Fragment {
     }
 
     public void napraviListuPrijatelja() {
+        prijateljiKorisnik = new ArrayList<>();
         for (Korisnik kP: korisnici) {
             if (prijateljiString.contains(kP.getUid())) {
                 prijateljiKorisnik.add(kP);
@@ -215,10 +224,12 @@ public class DodajPrijateljaFragment extends Fragment {
                 return 0;
             }
         });
-        if (rangListaPrijateljaAdapter == null) {
-            rangListaPrijateljaAdapter = new RangListaPrijateljaAdapter(prijateljiKorisnik,
+
+        rangListaPrijateljaAdapter = new RangListaPrijateljaAdapter(prijateljiKorisnik,
                     getContext(), trKorisnik);
+        if (!svi) {
+            listaView.setAdapter(rangListaPrijateljaAdapter);
+            rangListaPrijateljaAdapter.notifyDataSetChanged();
         }
-        rangListaPrijateljaAdapter.notifyDataSetChanged();
     }
 }

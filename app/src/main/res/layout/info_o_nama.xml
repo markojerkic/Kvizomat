@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:background="@color/colorPrimary"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Informacije o nama"
+        android:id="@+id/info_o_nama_naslov"
+        android:fontFamily="@font/raleway_bold"
+        android:textColor="@color/white"
+        android:textSize="30dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/info_o_nama_naslov"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="Marko Jerkić"
+        android:id="@+id/marko_info"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/raleway_bold"
+        android:textColor="@color/white"
+        android:textSize="20dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/marko_info"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="razvoj aplikacije, stvaranje pitanja"
+        android:id="@+id/marko_info_text"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/raleway_medium"
+        android:textColor="@color/white"
+        android:textSize="13dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/marko_info_text"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="Karlo Jerkić"
+        android:id="@+id/karlo_info"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/raleway_bold"
+        android:textColor="@color/white"
+        android:textSize="20dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/karlo_info"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="design aplikacije, \npitanja, web aplikacija"
+        android:id="@+id/karlo_info_text"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:fontFamily="@font/raleway_medium"
+        android:textColor="@color/white"
+        android:textSize="13dp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

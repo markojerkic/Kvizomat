@@ -137,7 +137,7 @@ public class HomeFragment extends Fragment {
                     Log.d("Korisnik", k.getIme());
                     if (k.getUid().equals(mFirebaseUser.getUid())) {
                         mKorisnik = k;
-                        korisnikKey = dataSnapshot.getKey();
+                        korisnikKey = ds.getKey();
                         mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(mKorisnik.getBodovi()));
                     }
 
