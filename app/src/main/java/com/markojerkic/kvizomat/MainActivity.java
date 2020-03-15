@@ -5,9 +5,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -155,41 +157,6 @@ public class MainActivity extends AppCompatActivity {
 
                      }
                  });
-//                db.addChildEventListener(new ChildEventListener() {
-//                    @Override
-//                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                        korisnici.add(dataSnapshot.getValue(Korisnik.class));
-//                    }
-//
-//                    @Override
-//                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                    }
-//                });
-//                ArrayList<String> pr = new ArrayList<>();
-//                pr.add("prvVr");
-//                Korisnik upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
-//                        mUser.getPhotoUrl().toString(), mUser.getUid(), pr, 0.f);
-//
-//                if (!korisnici.contains(upKor)) {
-//                    db.push().setValue(upKor);
-//                }
-//                updateUI();
             } else {
                 int errorCode = response.getError().getErrorCode();
                 Log.e("Kviz", "signin greška " + errorCode);
@@ -214,6 +181,16 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.info:
+                Toast.makeText(getApplicationContext(), "Test", Toast.LENGTH_SHORT).show();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -82,7 +82,6 @@ public class HomeFragment extends Fragment {
                     Pitanje pitanje = ds.getValue(Pitanje.class);
                     mListaPitanja.add(pitanje);
                 }
-//                findKorisnik();
                 setOnClick();
             }
 
@@ -91,37 +90,6 @@ public class HomeFragment extends Fragment {
 
             }
         });
-
-//        ChildEventListener childEventListener = new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                Pitanje pitanje = dataSnapshot.getValue(Pitanje.class);
-//                mListaPitanja.add(pitanje);
-//            }
-//
-//            @Override
-//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        };
-//        mRefPitanja.addChildEventListener(childEventListener);
-
-        // Set on-click listeners
 
         return root;
     }
@@ -181,37 +149,6 @@ public class HomeFragment extends Fragment {
 
             }
         });
-//        dbKorisnici.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                Korisnik k = dataSnapshot.getValue(Korisnik.class);
-//                if (k.getUid().equals(mFirebaseUser.getUid())) {
-//                    mKorisnik = k;
-//                    korisnikKey = dataSnapshot.getKey();
-//                    mBrojBodovaUkupni.setText("Bodovi: " + decimalFormat.format(mKorisnik.getBodovi()));
-//                }
-//            }
-//
-//            @Override
-//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
     }
 
     private ArrayList<Pitanje> randomPitanja (int brojPitanja) {
