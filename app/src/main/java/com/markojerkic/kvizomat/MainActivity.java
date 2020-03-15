@@ -48,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private ImageView userPhoto;
     private TextView odjavaView;
 
+    private Korisnik upKor;
+    final DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisnici");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,8 +71,19 @@ public class MainActivity extends AppCompatActivity {
             createSignInIntent();
         } else {
             mUser = FirebaseAuth.getInstance().getCurrentUser();
+            // Passing each menu ID as a set of Ids because each
+            // menu should be considered as top level destinations.
+
             updateUI();
         }
+
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
+                .setDrawerLayout(drawer)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
 
         odjavaView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,17 +93,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
-                .setDrawerLayout(drawer)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
-
     }
 
     private void odjava() {
@@ -120,22 +123,29 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                mUser = FirebaseAuth.getInstance().getCurrentUser();final ArrayList<Korisnik> korisnici = new ArrayList<>();
-                final DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisnici");
+                mUser = FirebaseAuth.getInstance().getCurrentUser();
+                final ArrayList<Korisnik> korisnici = new ArrayList<>();
+                final ArrayList<String> korUID = new ArrayList<>();
                  db.addListenerForSingleValueEvent(new ValueEventListener() {
                      @Override
                      public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                          for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                             korisnici.add(ds.getValue(Korisnik.class));
+                             Korisnik k = ds.getValue(Korisnik.class);
+                             korisnici.add(k);
+                             korUID.add(k.getUid());
                          }
                          ArrayList<String> pr = new ArrayList<>();
                          pr.add("prvVr");
-                         Korisnik upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
-                                 mUser.getPhotoUrl().toString(), mUser.getUid(), pr, 0.f);
                          Log.d("Korisnik", "Postojim");
 
-                         if (!korisnici.contains(upKor)) {
+                         if (!korUID.contains(mUser.getUid())) {
+                             upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
+                                     mUser.getPhotoUrl().toString(), mUser.getUid(), pr, 0.f);
                              db.push().setValue(upKor);
+                         } else {
+                             float bod = korisnici.get(korUID.indexOf(mUser.getUid())).getBodovi();
+                             upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
+                                     mUser.getPhotoUrl().toString(), mUser.getUid(), pr, bod);
                          }
                          updateUI();
                      }
