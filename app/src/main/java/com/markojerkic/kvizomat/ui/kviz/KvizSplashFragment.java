@@ -21,7 +21,7 @@ public class KvizSplashFragment extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent pitanjeActivity = new Intent(getApplicationContext(), Kviz.class);
+                Intent pitanjeActivity = new Intent(getApplicationContext(), KvizActivity.class);
 
                 pitanjeActivity.putExtra("pitanja", mInfo);
                 startActivity(pitanjeActivity);

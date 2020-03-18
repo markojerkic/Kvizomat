@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -21,15 +23,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.PostaviPitanje;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
-import com.markojerkic.kvizomat.ui.kviz.Kviz;
+import com.markojerkic.kvizomat.ui.kviz.KvizActivity;
 import com.markojerkic.kvizomat.ui.kviz.KvizInformacije;
 import com.markojerkic.kvizomat.ui.kviz.Pitanje;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 
 public class HomeFragment extends Fragment {
@@ -39,6 +44,7 @@ public class HomeFragment extends Fragment {
 
     private DatabaseReference mRefPitanja = FirebaseDatabase.getInstance().getReference("pitanja");
     private DatabaseReference dbKorisnici = FirebaseDatabase.getInstance().getReference("korisnici");
+    private FirebaseFunctions mFunction = FirebaseFunctions.getInstance();
 
     private HomeViewModel homeViewModel;
     private Button mLastManButton;
@@ -94,18 +100,36 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    public Task<HttpsCallableResult> getCloudPitanja() {
+        final boolean[] done = {false};
+            Task<HttpsCallableResult> task = mFunction.getHttpsCallable("nasumicnaPitanja ")
+                    .call();
+            return task;
+    }
+
     public void setOnClick() {
         mLastManButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent pitanjeActivity = new Intent(getActivity(), Kviz.class);
-                ArrayList<Pitanje> pitanja = randomPitanja(BROJ_PITANJA_PO_KATEGORIJI);
+                final Intent pitanjeActivity = new Intent(getActivity(), KvizActivity.class);
+                final ArrayList<Pitanje> pitanja = new ArrayList<>();
+                Task<HttpsCallableResult> task = getCloudPitanja();
 
-                pitanjeActivity.putExtra("pitanja", new KvizInformacije(pitanja));
-                pitanjeActivity.putExtra("korisnik", mKorisnik);
-                pitanjeActivity.putExtra("korisnikKey", korisnikKey);
-                startActivity(pitanjeActivity);
-                Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
+                task.addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                        ArrayList<Map<String, Object>> o =  (ArrayList<Map<String, Object>>) task.getResult().getData();
+                        for (Map<String, Object> ob: o) {
+                            pitanja.add(new Pitanje(ob));
+                            Log.d("Cloud fun", String.valueOf(pitanja.size()));
+                        }
+                        pitanjeActivity.putExtra("pitanja", new KvizInformacije(pitanja));
+                        pitanjeActivity.putExtra("korisnik", mKorisnik);
+                        pitanjeActivity.putExtra("korisnikKey", korisnikKey);
+                        startActivity(pitanjeActivity);
+                        Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 

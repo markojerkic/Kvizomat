@@ -1,6 +1,7 @@
 package com.markojerkic.kvizomat.ui.kviz;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class Pitanje implements Serializable {
     private String mPitanje;
@@ -11,6 +12,17 @@ public class Pitanje implements Serializable {
     private String mRazneInfomacije;
     private int mTezinaPitanja;
     private int mTocanOdgovor;
+
+    public Pitanje(Map<String, Object> map) {
+        this.mPitanje = (String) map.get("pitanje");
+        this.mOdgovorA = (String) map.get("odgovorA");
+        this.mOdgovorB = (String) map.get("odgovorB");
+        this.mOdgovorC = (String) map.get("odgovorC");
+        this.mOdgovorD = (String) map.get("odgovorD");
+        this.mRazneInfomacije = (String) map.get("razneInformacije");
+        this.mTezinaPitanja = (int) map.get("tezinaPitanja");
+        this.mTocanOdgovor = (int) map.get("tocanOdgovor");
+    }
 
     public Pitanje() {}
 
