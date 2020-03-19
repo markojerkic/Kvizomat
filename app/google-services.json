@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "488289984405-64slibavhgmaprf8rvio04um5qkfeujn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.markojerkic.kvizomat",
+            "certificate_hash": "b75e972e84849e5a9cc6d0b684a42d2be56e77e1"
+          }
+        },
+        {
           "client_id": "488289984405-cklfqc3v1690kp0n7ud16iqkoreu0i38.apps.googleusercontent.com",
           "client_type": 3
         }

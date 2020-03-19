@@ -23,6 +23,7 @@
         android:layout_height="75dp"
         app:layout_constraintStart_toEndOf="@id/leaderboard_rang"
         android:layout_marginLeft="25dp"
+        android:src="@mipmap/ic_launcher"
         app:layout_constraintTop_toTopOf="parent"
         android:id="@+id/slika_korisnik_list_leaderboard"/>
 

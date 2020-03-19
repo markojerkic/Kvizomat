@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
+    android:background="@color/colorAccent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upisite svoje informacije"
+        android:fontFamily="@font/raleway_bold"
+        android:textColor="@color/white"
+        android:id="@+id/naslov_upisi_informacije"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="25dp"/>
+
+    <EditText
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:hint="Ime"
+        android:layout_marginTop="15dp"
+        android:backgroundTint="@color/white"
+        android:textColorHint="@color/white"
+        android:textColor="@color/white"
+        android:fontFamily="@font/raleway_medium"
+        app:layout_constraintTop_toBottomOf="@id/naslov_upisi_informacije"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/upisi_ime"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/tipka"
+        app:layout_constraintTop_toBottomOf="@id/upisi_ime"
+        android:layout_marginTop="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Upiši"
+        android:textColor="@color/white"
+        android:fontFamily="@font/raleway_bold"
+        android:id="@+id/upisi_ime_tipka"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

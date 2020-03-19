@@ -1,5 +1,6 @@
 package com.markojerkic.kvizomat.ui.home;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,6 +51,7 @@ public class HomeFragment extends Fragment {
     private Button mLastManButton;
     private Button mCategoryButton;
     private TextView mBrojBodovaUkupni;
+    private Dialog upisiInfoDialog;
 
     private FirebaseUser mFirebaseUser;
     private Korisnik mKorisnik;
@@ -67,6 +69,7 @@ public class HomeFragment extends Fragment {
         mCategoryButton = root.findViewById(R.id.friendly_quitz_button);
         mBrojBodovaUkupni = root.findViewById(R.id.ukupan_br_bodova);
 
+//        upisiInfoDialog = new Dialog(getContext());
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -74,6 +77,14 @@ public class HomeFragment extends Fragment {
 
             findKorisnik();
         }
+//        mFunction.getHttpsCallable("sendNotification")
+//                .call(mFirebaseUser.getProviderId())
+//                .addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
+//            @Override
+//            public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+//                Log.d("Test", "Testic");
+//            }
+//        }).isComplete();
 
         decimalFormat = new DecimalFormat();
         decimalFormat.setMaximumFractionDigits(2);;
@@ -158,12 +169,34 @@ public class HomeFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
                     Korisnik k = ds.getValue(Korisnik.class);
-                    Log.d("Korisnik", k.getIme());
                     if (k.getUid().equals(mFirebaseUser.getUid())) {
                         mKorisnik = k;
                         korisnikKey = ds.getKey();
                         mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(mKorisnik.getBodovi()));
+
                     }
+//                    if (mKorisnik.getIme() == null && mFirebaseUser.getUid() == null) {
+//
+//                        upisiInfoDialog.setContentView(R.layout.upisi_informacije);
+//                        final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
+//                        Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
+//
+//                        upisiTipka.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                if (editText.getText().toString() == null) {
+//                                    Toast.makeText(getContext(),
+//                                            "Upisite informacije", Toast.LENGTH_LONG).show();
+//                                } else {
+//                                    mKorisnik.setIme(editText.getText().toString());
+//                                    dbKorisnici.child(korisnikKey).setValue(mKorisnik);
+//
+//                                }
+//                                upisiInfoDialog.cancel();
+//                            }
+//                        });
+//                        upisiInfoDialog.show();
+//                    }
 
                 }
             }

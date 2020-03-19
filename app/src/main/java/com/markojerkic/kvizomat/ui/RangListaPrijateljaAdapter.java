@@ -64,7 +64,8 @@ public class RangListaPrijateljaAdapter extends BaseAdapter {
         brojBodova.setText("Broj bodova: " + k.getBodovi());
 
         email.setText(k.getEmail());
-        Picasso.get().load(k.getUri()).into(slika);
+        if (!k.getUri().equals("null"))
+            Picasso.get().load(k.getUri()).into(slika);
 
         return convertView;
     }

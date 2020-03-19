@@ -2,14 +2,16 @@ package com.markojerkic.kvizomat;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +35,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
 
@@ -51,8 +55,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView odjavaView;
     private Dialog infoDialog;
 
+    private Dialog upisiInfoDialog;
+
     private Korisnik upKor;
     final DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisnici");
+    final DatabaseReference tokenDb =FirebaseDatabase.getInstance().getReference("korisniciToken");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
         userPhoto = navigationView.getHeaderView(0).findViewById(R.id.user_photo);
         odjavaView = navigationView.findViewById(R.id.odjava);
 
+        upisiInfoDialog = new Dialog(this);
+        upisiInfoDialog.setContentView(R.layout.upisi_informacije);
+
         infoDialog = new Dialog(this);
         infoDialog.setContentView(R.layout.info_o_nama);
 
@@ -77,10 +87,7 @@ public class MainActivity extends AppCompatActivity {
             createSignInIntent();
         } else {
             mUser = FirebaseAuth.getInstance().getCurrentUser();
-            // Passing each menu ID as a set of Ids because each
-            // menu should be considered as top level destinations.
-
-            updateUI();
+            setKorisnik();
         }
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -99,6 +106,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+
+            }
+        });
     }
 
     private void odjava() {
@@ -111,15 +125,74 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        String name = mUser.getDisplayName();
+        String name = upKor.getIme();
         String email = mUser.getEmail();
-        Uri photoURL = mUser.getPhotoUrl();
+        String photoURL = upKor.getUri();
         Log.d("auth", "ime: " + userName);
         Log.d("auth", "email " + userEmail);
         Log.d("auth", "photo " + photoURL);
         userEmail.setText(email);
         userName.setText(name);
-        Picasso.get().load(photoURL).into(userPhoto);
+        if (!photoURL.equals("null")) {
+            Picasso.get().load(photoURL).into(userPhoto);
+        }
+    }
+
+    public void setKorisnik() {
+        if (mUser == null)
+            mUser = FirebaseAuth.getInstance().getCurrentUser();
+        final ArrayList<Korisnik> korisnici = new ArrayList<>();
+        final ArrayList<String> korUID = new ArrayList<>();
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                final String korIndex[] = new String[1];
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    Korisnik k = ds.getValue(Korisnik.class);
+                    korisnici.add(k);
+                    korUID.add(k.getUid());
+                    Log.d("korisnik", mUser.getUid());
+                    if (k.getUid().equals(mUser.getUid())) {
+                        upKor = k;
+                        korIndex[0] = ds.getKey();
+                    }
+                }
+                if (upKor == null) {
+                    setKorisnik();
+                    return;
+                }
+
+                if (upKor.getIme().equals("null_null_null")) {
+                    final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
+                    Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
+                    upisiInfoDialog.show();
+
+                    upisiTipka.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (editText.getText().toString().equals("")) {
+                                Toast.makeText(getApplicationContext(),
+                                        "Upisite informacije", Toast.LENGTH_LONG).show();
+                            } else {
+                                upKor.setIme(editText.getText().toString().trim());
+                                db.child(korIndex[0]).setValue(upKor);
+                            }
+                            upisiInfoDialog.cancel();
+                            updateUI();
+                        }
+                    });
+                    updateUI();
+                } else {
+                    updateUI();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     @Override
@@ -129,45 +202,17 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                mUser = FirebaseAuth.getInstance().getCurrentUser();
-                final ArrayList<Korisnik> korisnici = new ArrayList<>();
-                final ArrayList<String> korUID = new ArrayList<>();
-                 db.addListenerForSingleValueEvent(new ValueEventListener() {
-                     @Override
-                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                         for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                             Korisnik k = ds.getValue(Korisnik.class);
-                             korisnici.add(k);
-                             korUID.add(k.getUid());
-                         }
-                         ArrayList<String> pr = new ArrayList<>();
-                         pr.add("prvVr");
-                         Log.d("Korisnik", mUser.getDisplayName());
-                         Log.d("Korisnik", mUser.getUid());
-                         Log.d("Korisnik", String.valueOf(mUser.getPhotoUrl()));
+                FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        String token = task.getResult().getToken();
 
-                         if (!korUID.contains(mUser.getUid())) {
-                             upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
-                                     mUser.getPhotoUrl().toString(),
-                                     mUser.getUid(), pr, 0.f);
-                             db.push().setValue(upKor);
-                         } else {
-                             float bod = korisnici.get(korUID.indexOf(mUser.getUid())).getBodovi();
-                             upKor = new Korisnik(mUser.getDisplayName(), mUser.getEmail(),
-                                     mUser.getPhotoUrl().toString(), mUser.getUid(), pr, bod);
-                         }
-                         updateUI();
-                     }
-
-                     @Override
-                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                     }
-                 });
+                        tokenDb.child(mUser.getUid()).setValue(token);
+                    }
+                });
+                setKorisnik();
             } else {
                 createSignInIntent();
-//                int errorCode = response.getError().getErrorCode();
-//                Log.e("Kviz", "signin greška " + errorCode);
             }
 
         }

@@ -64,7 +64,8 @@ public class ListaKorisnikaAdapter extends BaseAdapter {
             medjuPrijeateljima.setText("Ne poznajem ga");
         }
         email.setText(k.getEmail());
-        Picasso.get().load(k.getUri()).into(slika);
+        if (!k.getUri().equals("null"))
+            Picasso.get().load(k.getUri()).into(slika);
 
         return convertView;
 
