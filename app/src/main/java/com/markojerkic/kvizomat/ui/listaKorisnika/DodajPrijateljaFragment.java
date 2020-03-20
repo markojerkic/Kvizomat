@@ -219,10 +219,11 @@ public class DodajPrijateljaFragment extends Fragment {
             @Override
             public int compare(Korisnik o1, Korisnik o2) {
                 if (o1.getBodovi() > o2.getBodovi())
-                    return 1;
-                if (o1.getBodovi() < o2.getBodovi())
                     return -1;
-                return 0;
+                else if (o1.getBodovi() < o2.getBodovi())
+                    return 1;
+                else
+                    return 0;
             }
         });
 

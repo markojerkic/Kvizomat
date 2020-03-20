@@ -58,8 +58,9 @@ public class MainActivity extends AppCompatActivity {
     private Dialog upisiInfoDialog;
 
     private Korisnik upKor;
-    final DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisnici");
-    final DatabaseReference tokenDb =FirebaseDatabase.getInstance().getReference("korisniciToken");
+    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference db;
+    private DatabaseReference tokenDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        db = firebaseDatabase.getReference("korisnici");
+        tokenDb = firebaseDatabase.getReference("korisniciToken");
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);

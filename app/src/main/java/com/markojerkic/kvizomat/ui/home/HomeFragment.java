@@ -46,9 +46,12 @@ public class HomeFragment extends Fragment {
     private static final int BROJ_PITANJA_PO_KATEGORIJI = 3;
     private ArrayList<Pitanje> mListaPitanja;
 
-    private DatabaseReference mRefPitanja = FirebaseDatabase.getInstance().getReference("pitanja");
-    private DatabaseReference dbKorisnici = FirebaseDatabase.getInstance().getReference("korisnici");
+    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference mRefPitanja;
+    private DatabaseReference dbKorisnici;
+
     private FirebaseFunctions mFunction = FirebaseFunctions.getInstance();
+
 
     private HomeViewModel homeViewModel;
     private Button mLastManButton;
@@ -66,13 +69,14 @@ public class HomeFragment extends Fragment {
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
+        mRefPitanja = firebaseDatabase.getReference("pitanja");
+        dbKorisnici = firebaseDatabase.getReference("korisnici");
 
         // Set MainActivity main buttons upon entering
         mLastManButton = root.findViewById(R.id.last_man_button);
         mCategoryButton = root.findViewById(R.id.friendly_quitz_button);
         mBrojBodovaUkupni = root.findViewById(R.id.ukupan_br_bodova);
 
-//        upisiInfoDialog = new Dialog(getContext());
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -195,28 +199,6 @@ public class HomeFragment extends Fragment {
                         mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(mKorisnik.getBodovi()));
 
                     }
-//                    if (mKorisnik.getIme() == null && mFirebaseUser.getUid() == null) {
-//
-//                        upisiInfoDialog.setContentView(R.layout.upisi_informacije);
-//                        final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
-//                        Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
-//
-//                        upisiTipka.setOnClickListener(new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View v) {
-//                                if (editText.getText().toString() == null) {
-//                                    Toast.makeText(getContext(),
-//                                            "Upisite informacije", Toast.LENGTH_LONG).show();
-//                                } else {
-//                                    mKorisnik.setIme(editText.getText().toString());
-//                                    dbKorisnici.child(korisnikKey).setValue(mKorisnik);
-//
-//                                }
-//                                upisiInfoDialog.cancel();
-//                            }
-//                        });
-//                        upisiInfoDialog.show();
-//                    }
 
                 }
             }
@@ -236,8 +218,8 @@ public class HomeFragment extends Fragment {
         ArrayList<Pitanje> raz4 = new ArrayList<>();
         ArrayList<ArrayList<Pitanje>> kat = new ArrayList<>();
         kat.add(raz1);kat.add(raz2);kat.add(raz3); kat.add(raz4);
-        int razina = 1;
-        int br = 0;for (Pitanje p: mListaPitanja) {
+
+        for (Pitanje p: mListaPitanja) {
             switch (p.getTezinaPitanja()) {
                 case 1:
                     raz1.add(p); break;
@@ -269,7 +251,6 @@ public class HomeFragment extends Fragment {
     
     private boolean provjeriDodajPitanje(ArrayList<Pitanje> pitanjaRez, Pitanje trPit) {
         if (!pitanjaRez.contains(trPit)) {
-            pitanjaRez.add(trPit);
             return true;
         }
         return false;
