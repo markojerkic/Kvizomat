@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
@@ -64,7 +65,8 @@ public class ListaKorisnikaAdapter extends BaseAdapter {
             medjuPrijeateljima.setText("Ne poznajem ga");
         }
         email.setText(k.getEmail());
-        if (!k.getUri().equals("null"))
+
+        if (!k.getUri().equals("null") && NetworkConnection.hasConnection(context))
             Picasso.get().load(k.getUri()).into(slika);
 
         return convertView;

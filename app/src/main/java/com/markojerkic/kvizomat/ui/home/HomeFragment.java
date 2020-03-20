@@ -1,10 +1,8 @@
 package com.markojerkic.kvizomat.ui.home;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,8 +27,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
+import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
-import com.markojerkic.kvizomat.ui.PostaviPitanje;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.markojerkic.kvizomat.ui.kviz.KvizActivity;
 import com.markojerkic.kvizomat.ui.kviz.KvizInformacije;
@@ -54,8 +52,8 @@ public class HomeFragment extends Fragment {
 
 
     private HomeViewModel homeViewModel;
-    private Button mLastManButton;
-    private Button mCategoryButton;
+    private Button mSoloIgra;
+    private Button mIgraProtivPrijatelja;
     private TextView mBrojBodovaUkupni;
     private Dialog upisiInfoDialog;
 
@@ -73,8 +71,8 @@ public class HomeFragment extends Fragment {
         dbKorisnici = firebaseDatabase.getReference("korisnici");
 
         // Set MainActivity main buttons upon entering
-        mLastManButton = root.findViewById(R.id.last_man_button);
-        mCategoryButton = root.findViewById(R.id.friendly_quitz_button);
+        mSoloIgra = root.findViewById(R.id.last_man_button);
+        mIgraProtivPrijatelja = root.findViewById(R.id.friendly_quitz_button);
         mBrojBodovaUkupni = root.findViewById(R.id.ukupan_br_bodova);
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
@@ -126,12 +124,12 @@ public class HomeFragment extends Fragment {
     }
 
     public void setOnClick() {
-        mLastManButton.setOnClickListener(new View.OnClickListener() {
+        mSoloIgra.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Intent pitanjeActivity = new Intent(getActivity(), KvizActivity.class);
                 final ArrayList<Pitanje> pitanja = new ArrayList<>();
-                if (hasConnection()) {
+                if (NetworkConnection.hasConnection(getContext())) {
 
                     Task<HttpsCallableResult> task = getCloudPitanja();
 
@@ -161,21 +159,19 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        mCategoryButton.setOnClickListener(new View.OnClickListener() {
+        mIgraProtivPrijatelja.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Dialog uskoro = new Dialog(getContext());
+                uskoro.setContentView(R.layout.uskoro_stize);
+                uskoro.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                uskoro.show();
+                /*
                 Intent postaviPitanjeActivity = new Intent(getActivity(), PostaviPitanje.class);
                 startActivity(postaviPitanjeActivity);
-                Toast.makeText(getActivity(), "Ajmo napraviti par pitanja!!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Ajmo napraviti par pitanja!!!", Toast.LENGTH_SHORT).show();*/
             }
         });
-    }
-
-    private boolean hasConnection() {
-        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo ni = cm.getActiveNetworkInfo();
-        return ni != null && ni.isConnected();
-
     }
 
     @Override

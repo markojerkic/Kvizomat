@@ -129,7 +129,7 @@ public class KvizActivity extends AppCompatActivity {
                 brojTocnihOdgovora + "/" + mInfo.getIterator());
         if (mInfo.getIterator() % 3 == 0) {
             bodovi += ((float) brojTocnihOdgovora / (float) mInfo.getIterator())
-                    * (float) pitanje.getTezinaPitanja();
+                    * ((float) pitanje.getTezinaPitanja() * 0.7f);
             bodoviText.setText("Bodovi: " + decimalFormat.format(bodovi));
         }
         for (Button button: listaTipki) {
