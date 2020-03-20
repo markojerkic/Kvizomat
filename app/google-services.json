@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "488289984405-om8p0tg63ooq5tj9bt1rb81gjlfgtiui.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.markojerkic.kvizomat",
+            "certificate_hash": "6079038f143ecf47ede58fa23f40af5a8ba8ed3b"
+          }
+        },
+        {
+          "client_id": "488289984405-4qem1ihqk97fm3hf5ldh0blfd5jsa9au.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.markojerkic.kvizomat",
+            "certificate_hash": "7e82418908df47cc41fee624607e5ad389d6c0a6"
+          }
+        },
+        {
           "client_id": "488289984405-64slibavhgmaprf8rvio04um5qkfeujn.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

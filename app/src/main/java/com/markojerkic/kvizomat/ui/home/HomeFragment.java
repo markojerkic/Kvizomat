@@ -1,7 +1,10 @@
 package com.markojerkic.kvizomat.ui.home;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -124,23 +127,33 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 final Intent pitanjeActivity = new Intent(getActivity(), KvizActivity.class);
                 final ArrayList<Pitanje> pitanja = new ArrayList<>();
-                Task<HttpsCallableResult> task = getCloudPitanja();
+                if (hasConnection()) {
 
-                task.addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<HttpsCallableResult> task) {
-                        ArrayList<Map<String, Object>> o =  (ArrayList<Map<String, Object>>) task.getResult().getData();
-                        for (Map<String, Object> ob: o) {
-                            pitanja.add(new Pitanje(ob));
-                            Log.d("Cloud fun", String.valueOf(pitanja.size()));
+                    Task<HttpsCallableResult> task = getCloudPitanja();
+
+                    task.addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                            ArrayList<Map<String, Object>> o = (ArrayList<Map<String, Object>>) task.getResult().getData();
+                            for (Map<String, Object> ob : o) {
+                                pitanja.add(new Pitanje(ob));
+                                Log.d("Cloud fun", String.valueOf(pitanja.size()));
+                            }
+                            pitanjeActivity.putExtra("pitanja", new KvizInformacije(pitanja));
+                            pitanjeActivity.putExtra("korisnik", mKorisnik);
+                            pitanjeActivity.putExtra("korisnikKey", korisnikKey);
+                            startActivity(pitanjeActivity);
+                            Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
                         }
-                        pitanjeActivity.putExtra("pitanja", new KvizInformacije(pitanja));
-                        pitanjeActivity.putExtra("korisnik", mKorisnik);
-                        pitanjeActivity.putExtra("korisnikKey", korisnikKey);
-                        startActivity(pitanjeActivity);
-                        Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    });
+                } else {
+                    randomPitanja(BROJ_PITANJA_PO_KATEGORIJI, pitanja);
+                    pitanjeActivity.putExtra("pitanja", new KvizInformacije(pitanja));
+                    pitanjeActivity.putExtra("korisnik", mKorisnik);
+                    pitanjeActivity.putExtra("korisnikKey", korisnikKey);
+                    startActivity(pitanjeActivity);
+                    Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -152,6 +165,13 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getActivity(), "Ajmo napraviti par pitanja!!!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private boolean hasConnection() {
+        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        return ni != null && ni.isConnected();
+
     }
 
     @Override
@@ -208,16 +228,16 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private ArrayList<Pitanje> randomPitanja (int brojPitanja) {
+    private ArrayList<Pitanje> randomPitanja (int brojPitanjaPoKat, ArrayList<Pitanje> pitanjaRez) {
         Random random = new Random();
-        ArrayList<Pitanje> pitanjaRez = new ArrayList<>();
         ArrayList<Pitanje> raz1 = new ArrayList<>();
         ArrayList<Pitanje> raz2 = new ArrayList<>();
         ArrayList<Pitanje> raz3 = new ArrayList<>();
         ArrayList<Pitanje> raz4 = new ArrayList<>();
+        ArrayList<ArrayList<Pitanje>> kat = new ArrayList<>();
+        kat.add(raz1);kat.add(raz2);kat.add(raz3); kat.add(raz4);
         int razina = 1;
-        int br = 0;
-        for (Pitanje p: mListaPitanja) {
+        int br = 0;for (Pitanje p: mListaPitanja) {
             switch (p.getTezinaPitanja()) {
                 case 1:
                     raz1.add(p); break;
@@ -227,7 +247,7 @@ public class HomeFragment extends Fragment {
                 case 3:
                     raz3.add(p);
                     break;
-                case 4: 
+                case 4:
                     raz4.add(p);
                     break;
                 default:
@@ -235,52 +255,13 @@ public class HomeFragment extends Fragment {
                     break;
             }
         }
-        while (pitanjaRez.size() < brojPitanja*4) {
-            int idPitanja;
-            Pitanje trPit;
-            switch (razina) {
-                case 1:
-                    idPitanja = random.nextInt(raz1.size());
-                    trPit = raz1.get(idPitanja);
-                    if (provjeriDodajPitanje(pitanjaRez, trPit)) {
-                        br++;
-                        if (br == BROJ_PITANJA_PO_KATEGORIJI)
-                            razina++;
-                    br %= BROJ_PITANJA_PO_KATEGORIJI;                        
-                    }
-                    break;
-                case 2:
-                    idPitanja = random.nextInt(raz2.size());
-                    trPit = raz2.get(idPitanja);
-                    if (provjeriDodajPitanje(pitanjaRez, trPit)) {
-                        br++;
-                        if (br == BROJ_PITANJA_PO_KATEGORIJI)
-                            razina++;
-                        br %= BROJ_PITANJA_PO_KATEGORIJI;
-                    }
-                    break;
-                case 3:
-                    idPitanja = random.nextInt(raz3.size());
-                    trPit = raz3.get(idPitanja);
-                    if (provjeriDodajPitanje(pitanjaRez, trPit)) {
-                        br++;
-                        if (br == BROJ_PITANJA_PO_KATEGORIJI)
-                            razina++;
-                        br %= BROJ_PITANJA_PO_KATEGORIJI;
-                    }
-                    break;
-                case 4:
-                    idPitanja = random.nextInt(raz4.size());
-                    trPit = raz4.get(idPitanja);
-                    if (provjeriDodajPitanje(pitanjaRez, trPit)) {
-                        br++;
-                        if (br == BROJ_PITANJA_PO_KATEGORIJI)
-                            razina++;
-                        br %= BROJ_PITANJA_PO_KATEGORIJI;
-                    }
-                    break;
-                default:
-                    break;
+        for (int i = 0; i < kat.size(); i++) {
+            for (int j = 0; j < brojPitanjaPoKat; j++) {
+                int id = random.nextInt(kat.get(i).size());
+                while (!provjeriDodajPitanje(pitanjaRez, kat.get(i).get(id))){
+                    id = random.nextInt(kat.get(i).size());
+                }
+                pitanjaRez.add(kat.get(i).get(id));
             }
         }
         return pitanjaRez;

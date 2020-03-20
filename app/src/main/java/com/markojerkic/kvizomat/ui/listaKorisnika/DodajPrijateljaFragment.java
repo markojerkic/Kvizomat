@@ -160,7 +160,8 @@ public class DodajPrijateljaFragment extends Fragment {
                 } else
                     dodaj.setText("Dodaj prijatelja");
 
-                Picasso.get().load(izabraniKor.getUri()).into(slikaKorIzbr);
+                if (!izabraniKor.getUri().equals("null"))
+                    Picasso.get().load(izabraniKor.getUri()).into(slikaKorIzbr);
                 imeKor.setText(izabraniKor.getIme());
 
                 dodaj.setOnClickListener(new View.OnClickListener() {
