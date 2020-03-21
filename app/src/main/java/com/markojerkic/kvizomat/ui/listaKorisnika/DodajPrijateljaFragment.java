@@ -43,7 +43,7 @@ public class DodajPrijateljaFragment extends Fragment {
 
     private ArrayList<Korisnik> korisnici;
     ArrayList<String> korisniciKey;
-    private DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisnici");
+    private DatabaseReference db = FirebaseDatabase.getInstance().getReference("korisniciOnline");
 
     private ListView listaView;
     private ListaKorisnikaAdapter listaKorisnikaAdapter;
@@ -141,8 +141,11 @@ public class DodajPrijateljaFragment extends Fragment {
         listaView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-
-                final Korisnik izabraniKor = korisnici.get(position);
+                final Korisnik izabraniKor;
+                if (svi)
+                    izabraniKor = korisnici.get(position);
+                else
+                    izabraniKor = prijateljiKorisnik.get(position);
 
                 Log.d("korisnik", izabraniKor.getIme());
                 final View thisV = view;
@@ -201,7 +204,8 @@ public class DodajPrijateljaFragment extends Fragment {
                     }
                 });
 
-                dialog.show();
+                if (!izabraniKor.getUid().equals(trKorisnik.getUid()))
+                    dialog.show();
 
             }
         });
@@ -210,6 +214,7 @@ public class DodajPrijateljaFragment extends Fragment {
 
     public void napraviListuPrijatelja() {
         prijateljiKorisnik = new ArrayList<>();
+        prijateljiKorisnik.add(trKorisnik);
         for (Korisnik kP: korisnici) {
             Log.d("Korisnik", kP.getIme());
             if (prijateljiString.contains(kP.getUid())) {

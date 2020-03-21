@@ -40,7 +40,6 @@ import com.google.firebase.iid.InstanceIdResult;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -69,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         korisniciReference = firebaseDatabase.getReference("korisniciOnline");
         tokenDb = firebaseDatabase.getReference("korisniciToken");
 
@@ -144,9 +143,47 @@ public class MainActivity extends AppCompatActivity {
     public void setKorisnik() {
         if (mUser == null)
             mUser = FirebaseAuth.getInstance().getCurrentUser();
-        final ArrayList<Korisnik> korisnici = new ArrayList<>();
-        final ArrayList<String> korUID = new ArrayList<>();
-//        korisniciReference.child(mUser.getUid()).
+//        final ArrayList<Korisnik> korisnici = new ArrayList<>();
+//        final ArrayList<String> korUID = new ArrayList<>();
+        DatabaseReference trKorRef = korisniciReference.child(mUser.getUid());
+        trKorRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Korisnik k = dataSnapshot.getValue(Korisnik.class);
+                Log.d("Test s korisnikom", k.getIme());
+                upKor = k;
+
+                if (upKor.getIme().equals("null_null_null")) {
+                    final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
+                    Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
+                    upisiInfoDialog.show();
+
+                    upisiTipka.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (editText.getText().toString().equals("")) {
+                                Toast.makeText(getApplicationContext(),
+                                        "Upisite informacije", Toast.LENGTH_LONG).show();
+                            } else {
+                                upKor.setIme(editText.getText().toString().trim());
+                                korisniciReference.child(upKor.getUid()).setValue(upKor);
+                            }
+                            upisiInfoDialog.cancel();
+                            updateUI();
+                        }
+                    });
+                    updateUI();
+                }
+                updateUI();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        /*
         korisniciReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -196,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
+        */
     }
 
     @Override

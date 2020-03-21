@@ -37,7 +37,7 @@ public class KvizActivity extends AppCompatActivity {
 
     private DecimalFormat decimalFormat;
 
-    private DatabaseReference dbKorisnici = FirebaseDatabase.getInstance().getReference("korisnici");
+    private DatabaseReference dbKorisnici = FirebaseDatabase.getInstance().getReference("korisniciOnline");
 
     private KvizInformacije mInfo;
 

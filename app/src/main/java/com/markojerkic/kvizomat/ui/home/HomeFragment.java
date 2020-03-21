@@ -68,7 +68,7 @@ public class HomeFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         mRefPitanja = firebaseDatabase.getReference("pitanja");
-        dbKorisnici = firebaseDatabase.getReference("korisnici");
+        dbKorisnici = firebaseDatabase.getReference("korisniciOnline");
 
         // Set MainActivity main buttons upon entering
         mSoloIgra = root.findViewById(R.id.last_man_button);
@@ -184,19 +184,13 @@ public class HomeFragment extends Fragment {
     }
 
     private void findKorisnik() {
-        dbKorisnici.addListenerForSingleValueEvent(new ValueEventListener() {
+        dbKorisnici.child(mFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    Korisnik k = ds.getValue(Korisnik.class);
-                    if (k.getUid().equals(mFirebaseUser.getUid())) {
-                        mKorisnik = k;
-                        korisnikKey = ds.getKey();
-                        mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(mKorisnik.getBodovi()));
-
-                    }
-
-                }
+                Korisnik k = dataSnapshot.getValue(Korisnik.class);
+                mKorisnik = k;
+                korisnikKey = dataSnapshot.getKey();
+                mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(mKorisnik.getBodovi()));
             }
 
             @Override

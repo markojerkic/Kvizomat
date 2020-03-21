@@ -68,6 +68,12 @@ public class RangListaPrijateljaAdapter extends BaseAdapter {
         if (!k.getUri().equals("null") && NetworkConnection.hasConnection(context))
             Picasso.get().load(k.getUri()).into(slika);
 
+        if (k.getUid().equals(trKor.getUid())) {
+            convertView.setClickable(false);
+            ime.setText("Ja");
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
+        }
+
         return convertView;
     }
 }
