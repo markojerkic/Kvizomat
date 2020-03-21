@@ -7,8 +7,20 @@ public class Korisnik implements Serializable {
     private String ime, email, uid, uri;
     private ArrayList<String> prijatelji;
     private float bodovi;
+    private boolean online;
 
     public Korisnik() {}
+
+    public Korisnik(String ime, String email, String uri, String uid,
+                    ArrayList<String> prijatelji, float bodovi, boolean online) {
+        this.ime = ime;
+        this.email = email;
+        this.uri = uri;
+        this.uid = uid;
+        this.prijatelji = prijatelji;
+        this.bodovi = bodovi;
+        this.online = online;
+    }
 
     public Korisnik(String ime, String email, String uri, String uid,
                     ArrayList<String> prijatelji, float bodovi) {
@@ -18,6 +30,7 @@ public class Korisnik implements Serializable {
         this.uid = uid;
         this.prijatelji = prijatelji;
         this.bodovi = bodovi;
+        this.online = true;
     }
 
     public String getEmail() {

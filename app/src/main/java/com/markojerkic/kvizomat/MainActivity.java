@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Korisnik upKor;
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference db;
+    private DatabaseReference korisniciReference;
     private DatabaseReference tokenDb;
 
     @Override
@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        db = firebaseDatabase.getReference("korisnici");
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        korisniciReference = firebaseDatabase.getReference("korisniciOnline");
         tokenDb = firebaseDatabase.getReference("korisniciToken");
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -113,6 +113,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     private void odjava() {
         AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -141,7 +146,8 @@ public class MainActivity extends AppCompatActivity {
             mUser = FirebaseAuth.getInstance().getCurrentUser();
         final ArrayList<Korisnik> korisnici = new ArrayList<>();
         final ArrayList<String> korUID = new ArrayList<>();
-        db.addListenerForSingleValueEvent(new ValueEventListener() {
+//        korisniciReference.child(mUser.getUid()).
+        korisniciReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 final String korIndex[] = new String[1];
@@ -173,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                                         "Upisite informacije", Toast.LENGTH_LONG).show();
                             } else {
                                 upKor.setIme(editText.getText().toString().trim());
-                                db.child(korIndex[0]).setValue(upKor);
+                                korisniciReference.child(korIndex[0]).setValue(upKor);
                             }
                             upisiInfoDialog.cancel();
                             updateUI();

@@ -211,6 +211,7 @@ public class DodajPrijateljaFragment extends Fragment {
     public void napraviListuPrijatelja() {
         prijateljiKorisnik = new ArrayList<>();
         for (Korisnik kP: korisnici) {
+            Log.d("Korisnik", kP.getIme());
             if (prijateljiString.contains(kP.getUid())) {
                 prijateljiKorisnik.add(kP);
             }
