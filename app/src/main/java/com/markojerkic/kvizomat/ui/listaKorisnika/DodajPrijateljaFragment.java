@@ -1,6 +1,7 @@
 package com.markojerkic.kvizomat.ui.listaKorisnika;
 
 import android.app.Dialog;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -204,8 +205,10 @@ public class DodajPrijateljaFragment extends Fragment {
                     }
                 });
 
-                if (!izabraniKor.getUid().equals(trKorisnik.getUid()))
+                if (!izabraniKor.getUid().equals(trKorisnik.getUid())) {
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
                     dialog.show();
+                }
 
             }
         });

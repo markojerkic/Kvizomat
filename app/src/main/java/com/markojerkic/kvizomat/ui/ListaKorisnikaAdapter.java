@@ -60,9 +60,9 @@ public class ListaKorisnikaAdapter extends BaseAdapter {
         ime.setText(k.getIme());
         Log.d("prijatelj", String.valueOf(trKor.getPrijatelji().contains(k.getUid())));
         if (trKor.getPrijatelji().contains(k.getUid())) {
-            medjuPrijeateljima.setText("Moj prijatelj");
+            medjuPrijeateljima.setText(R.string.moj_prijatelj);
         } else {
-            medjuPrijeateljima.setText("Ne poznajem ga");
+            medjuPrijeateljima.setText(R.string.nije_prijatelj);
         }
         email.setText(k.getEmail());
 

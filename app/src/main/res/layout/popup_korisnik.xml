@@ -3,7 +3,8 @@
     android:layout_width="350dp"
     android:layout_height="280dp"
     android:padding="20dp"
-    android:background="@color/colorAccent"
+    android:background="@drawable/tipka"
+    android:backgroundTint="@color/colorPrimary"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView

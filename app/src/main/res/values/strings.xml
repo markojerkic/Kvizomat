@@ -23,8 +23,8 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
-    <string name="dumy_question">Tko je trnutačni predsjenik Republike Hrvatske?</string>
-    <string name="spremi_pitanje">Spremi pitanje</string>
+    <string name="nije_prijatelj">Ne poznajem ga/ju</string>
+    <string name="moj_prijatelj">Moj prijatelj/ica</string>
     <string name="dodaj_prijatelja">Dodaj prijatelja</string>
     <string name="odustani_prijatelj">Odustani</string>
 </resources>

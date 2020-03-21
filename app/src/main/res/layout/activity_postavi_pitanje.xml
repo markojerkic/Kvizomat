@@ -70,7 +70,7 @@
         android:id="@+id/stavi_pitanje_baza_pod"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/spremi_pitanje"
+        android:text="Spremi pitanje"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

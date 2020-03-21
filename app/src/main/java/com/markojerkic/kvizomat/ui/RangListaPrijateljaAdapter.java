@@ -72,6 +72,9 @@ public class RangListaPrijateljaAdapter extends BaseAdapter {
             convertView.setClickable(false);
             ime.setText("Ja");
             convertView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
+        } else {
+            convertView.setClickable(true);
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
         }
 
         return convertView;
