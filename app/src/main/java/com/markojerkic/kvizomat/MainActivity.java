@@ -68,9 +68,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         korisniciReference = firebaseDatabase.getReference("korisniciOnline");
         tokenDb = firebaseDatabase.getReference("korisniciToken");
+        korisniciReference.keepSynced(true);
+        tokenDb.keepSynced(true);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -112,12 +113,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     private void odjava() {
+        korisniciReference.child(upKor.getUid()).child("online").setValue(false);
         AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -143,8 +140,6 @@ public class MainActivity extends AppCompatActivity {
     public void setKorisnik() {
         if (mUser == null)
             mUser = FirebaseAuth.getInstance().getCurrentUser();
-//        final ArrayList<Korisnik> korisnici = new ArrayList<>();
-//        final ArrayList<String> korUID = new ArrayList<>();
         DatabaseReference trKorRef = korisniciReference.child(mUser.getUid());
         trKorRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -174,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                     updateUI();
                 }
+                korisniciReference.child(upKor.getUid()).child("online").setValue(true);
                 updateUI();
 
             }
@@ -183,57 +179,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        /*
-        korisniciReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                final String korIndex[] = new String[1];
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    Korisnik k = ds.getValue(Korisnik.class);
-                    korisnici.add(k);
-                    korUID.add(k.getUid());
-                    Log.d("korisnik", mUser.getUid());
-                    if (k.getUid().equals(mUser.getUid())) {
-                        upKor = k;
-                        korIndex[0] = ds.getKey();
-                    }
-                }
-                if (upKor == null) {
-                    setKorisnik();
-                    return;
-                }
-
-                if (upKor.getIme().equals("null_null_null")) {
-                    final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
-                    Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
-                    upisiInfoDialog.show();
-
-                    upisiTipka.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (editText.getText().toString().equals("")) {
-                                Toast.makeText(getApplicationContext(),
-                                        "Upisite informacije", Toast.LENGTH_LONG).show();
-                            } else {
-                                upKor.setIme(editText.getText().toString().trim());
-                                korisniciReference.child(korIndex[0]).setValue(upKor);
-                            }
-                            upisiInfoDialog.cancel();
-                            updateUI();
-                        }
-                    });
-                    updateUI();
-                } else {
-                    updateUI();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        */
     }
 
     @Override
