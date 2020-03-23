@@ -23,6 +23,9 @@
         </service>
 
         <activity android:name=".ui.kviz.multiplayer.MultiplayerKviz"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="Igra protiv prijatelja"
+            android:theme="@style/FullscreenTheme"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.kviz.KvizActivity"

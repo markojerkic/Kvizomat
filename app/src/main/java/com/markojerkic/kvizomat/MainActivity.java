@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 555;
     private AppBarConfiguration mAppBarConfiguration;
-    private FirebaseUser mUser;
+    private FirebaseUser mTrenutniUser;
     private TextView userName;
     private TextView userEmail;
     private ImageView userPhoto;
@@ -56,7 +56,9 @@ public class MainActivity extends AppCompatActivity {
 
     private Dialog upisiInfoDialog;
 
-    private Korisnik upKor;
+    private KvizomatApp app;
+
+    private Korisnik trenutniKorisnik;
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference korisniciReference;
     private DatabaseReference tokenDb;
@@ -68,10 +70,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        korisniciReference = firebaseDatabase.getReference("korisniciOnline");
-        tokenDb = firebaseDatabase.getReference("korisniciToken");
-        korisniciReference.keepSynced(true);
-        tokenDb.keepSynced(true);
+        app = (KvizomatApp) getApplicationContext();
+
+//        korisniciReference = firebaseDatabase.getReference("korisniciOnline");
+//        tokenDb = firebaseDatabase.getReference("korisniciToken");
+//        korisniciReference.keepSynced(true);
+//        tokenDb.keepSynced(true);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -91,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("auth", "nema usera");
             createSignInIntent();
         } else {
-            mUser = FirebaseAuth.getInstance().getCurrentUser();
+            mTrenutniUser = app.getTrenutniUser();
             setKorisnik();
         }
 
@@ -106,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         odjavaView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mUser != null) {
+                if (mTrenutniUser != null) {
                     odjava();
                 }
             }
@@ -114,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void odjava() {
-        korisniciReference.child(upKor.getUid()).child("online").setValue(false);
+        korisniciReference.child(trenutniKorisnik.getUid()).child("online").setValue(false);
         AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -124,9 +128,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        String name = upKor.getIme();
-        String email = mUser.getEmail();
-        String photoURL = upKor.getUri();
+        String name = trenutniKorisnik.getIme();
+        String email = mTrenutniUser.getEmail();
+        String photoURL = trenutniKorisnik.getUri();
         Log.d("auth", "ime: " + userName);
         Log.d("auth", "email " + userEmail);
         Log.d("auth", "photo " + photoURL);
@@ -138,17 +142,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setKorisnik() {
-        if (mUser == null)
-            mUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference trKorRef = korisniciReference.child(mUser.getUid());
-        trKorRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        FirebaseDatabase.getInstance().getReference("korisniciOnline").child(mTrenutniUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Korisnik k = dataSnapshot.getValue(Korisnik.class);
                 Log.d("Test s korisnikom", k.getIme());
-                upKor = k;
+                trenutniKorisnik = k;
 
-                if (upKor.getIme().equals("null_null_null")) {
+                korisniciReference.child(trenutniKorisnik.getUid()).child("online").setValue(true);
+                FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        String token = task.getResult().getToken();
+
+                        app.getTokenReference().child(trenutniKorisnik.getUid()).setValue(token);
+                    }
+                });
+
+                korisniciReference.child(mTrenutniUser.getUid()).child("online").setValue(true);
+                korisniciReference.child(mTrenutniUser.getUid()).child("online").onDisconnect().setValue(false);
+                if (trenutniKorisnik.getIme().equals("null_null_null")) {
                     final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
                     Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
                     upisiInfoDialog.show();
@@ -160,8 +175,8 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(),
                                         "Upisite informacije", Toast.LENGTH_LONG).show();
                             } else {
-                                upKor.setIme(editText.getText().toString().trim());
-                                korisniciReference.child(upKor.getUid()).setValue(upKor);
+                                trenutniKorisnik.setIme(editText.getText().toString().trim());
+                                app.setTrenutniKorisnik(trenutniKorisnik);
                             }
                             upisiInfoDialog.cancel();
                             updateUI();
@@ -169,8 +184,6 @@ public class MainActivity extends AppCompatActivity {
                     });
                     updateUI();
                 }
-                korisniciReference.child(upKor.getUid()).child("online").setValue(true);
-                updateUI();
 
             }
 
@@ -179,6 +192,50 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
+
+        if (mTrenutniUser == null)
+            mTrenutniUser = FirebaseAuth.getInstance().getCurrentUser();
+//        DatabaseReference trKorRef = korisniciReference.child(mUser.getUid());
+//        trKorRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                Korisnik k = dataSnapshot.getValue(Korisnik.class);
+//                Log.d("Test s korisnikom", k.getIme());
+//                upKor = k;
+//
+//                if (upKor.getIme().equals("null_null_null")) {
+//                    final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
+//                    Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
+//                    upisiInfoDialog.show();
+//
+//                    upisiTipka.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            if (editText.getText().toString().equals("")) {
+//                                Toast.makeText(getApplicationContext(),
+//                                        "Upisite informacije", Toast.LENGTH_LONG).show();
+//                            } else {
+//                                upKor.setIme(editText.getText().toString().trim());
+//                                korisniciReference.child(upKor.getUid()).setValue(upKor);
+//                            }
+//                            upisiInfoDialog.cancel();
+//                            updateUI();
+//                        }
+//                    });
+//                    updateUI();
+//                }
+//                korisniciReference.child(upKor.getUid()).child("online").setValue(true);
+//                updateUI();
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 
     @Override
@@ -188,14 +245,15 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        String token = task.getResult().getToken();
-
-                        tokenDb.child(mUser.getUid()).setValue(token);
-                    }
-                });
+                app.setTrenutniUser();
+//                FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+//                        String token = task.getResult().getToken();
+//
+//                        tokenDb.child(mUser.getUid()).setValue(token);
+//                    }
+//                });
                 setKorisnik();
             } else {
                 createSignInIntent();

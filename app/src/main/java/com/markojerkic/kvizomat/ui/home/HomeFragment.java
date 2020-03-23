@@ -18,15 +18,12 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
+import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
@@ -58,8 +55,10 @@ public class HomeFragment extends Fragment {
     private TextView mBrojBodovaUkupni;
     private Dialog upisiInfoDialog;
 
-    private FirebaseUser mFirebaseUser;
-    private Korisnik mKorisnik;
+    private KvizomatApp app;
+
+    private FirebaseUser mTrenutniUser;
+    private Korisnik mTrenutniKorisnik;
     private String korisnikKey;
     private DecimalFormat decimalFormat;
 
@@ -68,21 +67,17 @@ public class HomeFragment extends Fragment {
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        mRefPitanja = firebaseDatabase.getReference("pitanja");
-        dbKorisnici = firebaseDatabase.getReference("korisniciOnline");
+        app = (KvizomatApp) getContext().getApplicationContext();
+
+//        mRefPitanja = firebaseDatabase.getReference("pitanja");
+//        dbKorisnici = firebaseDatabase.getReference("korisniciOnline");
 
         // Set MainActivity main buttons upon entering
         mSoloIgra = root.findViewById(R.id.last_man_button);
         mIgraProtivPrijatelja = root.findViewById(R.id.friendly_quitz_button);
         mBrojBodovaUkupni = root.findViewById(R.id.ukupan_br_bodova);
 
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-            Log.d("Korisnik", mFirebaseUser.getDisplayName());
-
-            findKorisnik();
-        }
 //        mFunction.getHttpsCallable("sendNotification")
 //                .call(mFirebaseUser.getProviderId())
 //                .addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
@@ -98,21 +93,24 @@ public class HomeFragment extends Fragment {
         // Database listener
         mListaPitanja = new ArrayList<>();
 
-        mRefPitanja.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    Pitanje pitanje = ds.getValue(Pitanje.class);
-                    mListaPitanja.add(pitanje);
-                }
-                setOnClick();
-            }
+//        mRefPitanja.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+//                    Pitanje pitanje = ds.getValue(Pitanje.class);
+//                    mListaPitanja.add(pitanje);
+//                }
+//                setOnClick();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+        setOnClick();
 
         return root;
     }
@@ -143,16 +141,18 @@ public class HomeFragment extends Fragment {
                                 Log.d("Cloud fun", String.valueOf(pitanja.size()));
                             }
                             pitanjeActivity.putExtra("pitanja", new KvizInformacije(pitanja));
-                            pitanjeActivity.putExtra("korisnik", mKorisnik);
+                            pitanjeActivity.putExtra("korisnik", mTrenutniKorisnik);
                             pitanjeActivity.putExtra("korisnikKey", korisnikKey);
                             startActivity(pitanjeActivity);
                             Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {
+                    if (!NetworkConnection.hasConnection(getContext()))
+                        mListaPitanja = app.getListaPitanja();
                     randomPitanja(BROJ_PITANJA_PO_KATEGORIJI, pitanja);
                     pitanjeActivity.putExtra("pitanja", new KvizInformacije(pitanja));
-                    pitanjeActivity.putExtra("korisnik", mKorisnik);
+                    pitanjeActivity.putExtra("korisnik", mTrenutniKorisnik);
                     pitanjeActivity.putExtra("korisnikKey", korisnikKey);
                     startActivity(pitanjeActivity);
                     Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
@@ -170,7 +170,7 @@ public class HomeFragment extends Fragment {
 
                 Intent postaviPitanjeActivity = new Intent(getActivity(), MultiplayerKviz.class);
                 startActivity(postaviPitanjeActivity);
-                Toast.makeText(getActivity(), "Ajmo napraviti par pitanja!!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Iskušaj se protiv svojih prijatelja!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -178,27 +178,14 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (mFirebaseUser != null) {
-            mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (mTrenutniUser == null) {
+            mTrenutniUser = app.getTrenutniUser();
             findKorisnik();
         }
     }
 
     private void findKorisnik() {
-        dbKorisnici.child(mFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Korisnik k = dataSnapshot.getValue(Korisnik.class);
-                mKorisnik = k;
-                korisnikKey = dataSnapshot.getKey();
-                mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(mKorisnik.getBodovi()));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        mTrenutniKorisnik = app.getTrenutniKorisnik();
     }
 
     private ArrayList<Pitanje> randomPitanja (int brojPitanjaPoKat, ArrayList<Pitanje> pitanjaRez) {
