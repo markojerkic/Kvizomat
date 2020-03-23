@@ -33,6 +33,7 @@ import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.markojerkic.kvizomat.ui.kviz.KvizActivity;
 import com.markojerkic.kvizomat.ui.kviz.KvizInformacije;
 import com.markojerkic.kvizomat.ui.kviz.Pitanje;
+import com.markojerkic.kvizomat.ui.kviz.multiplayer.MultiplayerKviz;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -165,11 +166,11 @@ public class HomeFragment extends Fragment {
                 Dialog uskoro = new Dialog(getContext());
                 uskoro.setContentView(R.layout.uskoro_stize);
                 uskoro.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                uskoro.show();
-                /*
-                Intent postaviPitanjeActivity = new Intent(getActivity(), PostaviPitanje.class);
+//                uskoro.show();
+
+                Intent postaviPitanjeActivity = new Intent(getActivity(), MultiplayerKviz.class);
                 startActivity(postaviPitanjeActivity);
-                Toast.makeText(getActivity(), "Ajmo napraviti par pitanja!!!", Toast.LENGTH_SHORT).show();*/
+                Toast.makeText(getActivity(), "Ajmo napraviti par pitanja!!!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -212,7 +213,8 @@ public class HomeFragment extends Fragment {
         for (Pitanje p: mListaPitanja) {
             switch (p.getTezinaPitanja()) {
                 case 1:
-                    raz1.add(p); break;
+                    raz1.add(p);
+                    break;
                 case 2:
                     raz2.add(p);
                     break;
@@ -223,7 +225,7 @@ public class HomeFragment extends Fragment {
                     raz4.add(p);
                     break;
                 default:
-                    raz1.add(p);
+                    raz4.add(p);
                     break;
             }
         }

@@ -79,6 +79,7 @@ public class DodajPrijateljaFragment extends Fragment {
         listaView = root.findViewById(R.id.lista_korisnika_view);
         korisniciListaTextView = root.findViewById(R.id.lista_korisnici_text);
         mojiPrijateljiListaTextView = root.findViewById(R.id.lista_moji_prijatelji_text);
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         korisniciListaTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,8 +102,6 @@ public class DodajPrijateljaFragment extends Fragment {
                 rangListaPrijateljaAdapter.notifyDataSetChanged();
             }
         });
-
-        user = FirebaseAuth.getInstance().getCurrentUser();
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -208,7 +207,8 @@ public class DodajPrijateljaFragment extends Fragment {
                 if (!izabraniKor.getUid().equals(trKorisnik.getUid())) {
                     dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
                     dialog.show();
-                }
+                } else
+                    Log.d("Klik", "korisnik sam ja");
 
             }
         });

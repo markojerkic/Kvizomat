@@ -22,7 +22,7 @@
                 android:resource="@mipmap/ic_launcher" />
         </service>
 
-        <activity android:name=".ui.PostaviPitanje"
+        <activity android:name=".ui.kviz.multiplayer.MultiplayerKviz"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.kviz.KvizActivity"

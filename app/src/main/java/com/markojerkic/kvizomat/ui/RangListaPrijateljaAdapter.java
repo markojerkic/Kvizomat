@@ -69,11 +69,11 @@ public class RangListaPrijateljaAdapter extends BaseAdapter {
             Picasso.get().load(k.getUri()).into(slika);
 
         if (k.getUid().equals(trKor.getUid())) {
-            convertView.setClickable(false);
+//            convertView.setClickable(true);
             ime.setText("Ja");
             convertView.setBackgroundColor(context.getResources().getColor(R.color.colorAccent));
         } else {
-            convertView.setClickable(true);
+//            convertView.setClickable(true);
             convertView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
         }
 
