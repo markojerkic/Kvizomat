@@ -30,8 +30,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
 
@@ -54,8 +52,6 @@ public class MainActivity extends AppCompatActivity {
     private KvizomatApp app;
 
     private Korisnik trenutniKorisnik;
-    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference korisniciReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +61,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         app = (KvizomatApp) getApplicationContext();
-
-        korisniciReference = firebaseDatabase.getReference("korisniciOnline");
-        korisniciReference.keepSynced(true);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -110,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void odjava() {
-        korisniciReference.child(trenutniKorisnik.getUid()).child("online").setValue(false);
+        app.setOnline(false);
         AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {

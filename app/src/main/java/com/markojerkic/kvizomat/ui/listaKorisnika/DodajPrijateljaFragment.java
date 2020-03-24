@@ -21,11 +21,9 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.ListaKorisnikaAdapter;
 import com.markojerkic.kvizomat.ui.RangListaPrijateljaAdapter;
@@ -49,13 +47,15 @@ public class DodajPrijateljaFragment extends Fragment {
     private ListView listaView;
     private ListaKorisnikaAdapter listaKorisnikaAdapter;
     private RangListaPrijateljaAdapter rangListaPrijateljaAdapter;
-    private Korisnik trKorisnik;
+    private Korisnik trenutniKorisnik;
     private String trKorisnikKey;
 
     private TextView korisniciListaTextView;
     private TextView mojiPrijateljiListaTextView;
 
     private boolean svi = true;
+    private FirebaseUser trenutniUser;
+    private KvizomatApp app;
 
     private TextView prijateljIliNeText;
 
@@ -69,12 +69,14 @@ public class DodajPrijateljaFragment extends Fragment {
         dodajPrijateljaViewModel = ViewModelProviders.of(this).get(DodajPrijateljaViewModel.class);
         final View root = inflater.inflate(R.layout.fragment_dodaj_prijatelja, container, false);
 
+        app = (KvizomatApp) getContext().getApplicationContext();
+
         korisnici = new ArrayList<>();
         korisniciKey = new ArrayList<>();
         prijateljiKorisnik = new ArrayList<>();
         dialog = new Dialog(getContext());
 
-        final FirebaseUser trUsr = FirebaseAuth.getInstance().getCurrentUser();
+        trenutniUser = app.getTrenutniUser();
 
         listaView = root.findViewById(R.id.lista_korisnika_view);
         korisniciListaTextView = root.findViewById(R.id.lista_korisnici_text);
@@ -103,21 +105,30 @@ public class DodajPrijateljaFragment extends Fragment {
             }
         });
 
+        korisnici = app.getListaKorisnika();
+        trenutniKorisnik = app.getTrenutniKorisnik();
+        prijateljiString = trenutniKorisnik.getPrijatelji();
+
+        listaKorisnikaAdapter = new ListaKorisnikaAdapter(korisnici, getContext(), trenutniKorisnik);
+        listaView.setAdapter(listaKorisnikaAdapter);
+        listaKorisnikaAdapter.notifyDataSetChanged();
+
+        /*
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
                     Korisnik kor = ds.getValue(Korisnik.class);
-                    if (kor.getUid().compareTo(trUsr.getUid()) != 0) {
+                    if (kor.getUid().compareTo(trenutniUser.getUid()) != 0) {
                         korisnici.add(kor);
                         korisniciKey.add(ds.getKey());
                         Log.d("korisnici", kor.getUid());
                     } else {
-                        trKorisnik = kor;
+                        trenutniKorisnik = kor;
                         trKorisnikKey = ds.getKey();
-                        prijateljiString = trKorisnik.getPrijatelji();
+                        prijateljiString = trenutniKorisnik.getPrijatelji();
 
-                        listaKorisnikaAdapter = new ListaKorisnikaAdapter(korisnici, getContext(), trKorisnik);
+                        listaKorisnikaAdapter = new ListaKorisnikaAdapter(korisnici, getContext(), trenutniKorisnik);
                         listaView.setAdapter(listaKorisnikaAdapter);
                         listaKorisnikaAdapter.notifyDataSetChanged();
                     }
@@ -136,7 +147,7 @@ public class DodajPrijateljaFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        });*/
 
         listaView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -174,9 +185,9 @@ public class DodajPrijateljaFragment extends Fragment {
                         if (!prijateljiString.contains(izabraniKor.getUid())) {
                             prijateljiString.add(izabraniKor.getUid());
                             prijateljiKorisnik.add(izabraniKor);
-                            Log.d("Korisnik key", korisniciKey.get(position));
 
-                            db.child(trKorisnikKey).child("prijatelji").setValue(prijateljiString);
+                            app.setListaPrijatelja(prijateljiString);
+//                            db.child(trKorisnikKey).child("prijatelji").setValue(prijateljiString);
                             if (svi)
                                 prijateljIliNeText.setText("Moj prijatelj");
                             napraviListuPrijatelja();
@@ -186,7 +197,7 @@ public class DodajPrijateljaFragment extends Fragment {
                         } else {
                             prijateljiString.remove(izabraniKor.getUid());
                             prijateljiKorisnik.remove(izabraniKor);
-                            db.child(trKorisnikKey).child("prijatelji").setValue(prijateljiString);
+                            app.setListaPrijatelja(prijateljiString);
                             if (svi)
                                 prijateljIliNeText.setText("Ne poznajem ga");
                             napraviListuPrijatelja();
@@ -204,7 +215,7 @@ public class DodajPrijateljaFragment extends Fragment {
                     }
                 });
 
-                if (!izabraniKor.getUid().equals(trKorisnik.getUid())) {
+                if (!izabraniKor.getUid().equals(trenutniKorisnik.getUid())) {
                     dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
                     dialog.show();
                 } else
@@ -217,7 +228,7 @@ public class DodajPrijateljaFragment extends Fragment {
 
     public void napraviListuPrijatelja() {
         prijateljiKorisnik = new ArrayList<>();
-        prijateljiKorisnik.add(trKorisnik);
+        prijateljiKorisnik.add(trenutniKorisnik);
         for (Korisnik kP: korisnici) {
             Log.d("Korisnik", kP.getIme());
             if (prijateljiString.contains(kP.getUid())) {
@@ -237,7 +248,7 @@ public class DodajPrijateljaFragment extends Fragment {
         });
 
         rangListaPrijateljaAdapter = new RangListaPrijateljaAdapter(prijateljiKorisnik,
-                    getContext(), trKorisnik);
+                    getContext(), trenutniKorisnik);
         if (!svi) {
             listaView.setAdapter(rangListaPrijateljaAdapter);
             rangListaPrijateljaAdapter.notifyDataSetChanged();

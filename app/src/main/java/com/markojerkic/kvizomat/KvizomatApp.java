@@ -73,6 +73,10 @@ public class KvizomatApp extends Application {
         }
     }
 
+    public void setOnline(boolean online) {
+        korisniciReference.child(trenutniKorisnik.getUid()).child("online").setValue(online);
+    }
+
     public void setTrenutniUser() {
         trenutniUser = FirebaseAuth.getInstance().getCurrentUser();
         setKorisnik(new FirebaseKorisnikCallback() {
@@ -164,17 +168,20 @@ public class KvizomatApp extends Application {
 //        }
     }
 
+    public void setListaPrijatelja(ArrayList<String> prijatelji) {
+        trenutniKorisnik.setPrijatelji(prijatelji);
+        korisniciReference.child(trenutniKorisnik.getUid()).child("prijatelji").setValue(prijatelji);
+    }
+
     public void setListaKorisnika() {
-        listaKorisnika = new ArrayList<>();
         korisniciReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                listaKorisnika = new ArrayList<>();
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
                     Korisnik korisnikChild = ds.getValue(Korisnik.class);
                     if (!korisnikChild.getUid().equals(trenutniKorisnik.getUid())) {
                         listaKorisnika.add(korisnikChild);
-                    } else {
-
                     }
                 }
                 napraviListuPrijatelja();
