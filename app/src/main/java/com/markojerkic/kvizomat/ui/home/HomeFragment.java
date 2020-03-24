@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
+import com.markojerkic.kvizomat.FirebaseKorisnikCallback;
 import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
@@ -109,7 +110,7 @@ public class HomeFragment extends Fragment {
 //            }
 //        });
 
-
+//        findKorisnik();
         setOnClick();
 
         return root;
@@ -186,6 +187,20 @@ public class HomeFragment extends Fragment {
 
     private void findKorisnik() {
         mTrenutniKorisnik = app.getTrenutniKorisnik();
+        if (mTrenutniKorisnik == null) {
+            app.setKorisnik(new FirebaseKorisnikCallback() {
+                @Override
+                public void onCallback(Korisnik korisnik) {
+                    mTrenutniKorisnik = korisnik;
+                    mTrenutniKorisnik.setOnline(true);
+                    float bodovi = mTrenutniKorisnik.getBodovi();
+                    mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(bodovi));
+                }
+            });
+        } else {
+            float bodovi = mTrenutniKorisnik.getBodovi();
+            mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(bodovi));
+        }
     }
 
     private ArrayList<Pitanje> randomPitanja (int brojPitanjaPoKat, ArrayList<Pitanje> pitanjaRez) {

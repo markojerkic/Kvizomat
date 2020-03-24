@@ -33,6 +33,14 @@ public class Korisnik implements Serializable {
         this.online = true;
     }
 
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
     public String getEmail() {
         return email;
     }

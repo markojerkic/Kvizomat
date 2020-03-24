@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.R;
 
 import java.text.DecimalFormat;
@@ -33,6 +34,8 @@ public class KvizActivity extends AppCompatActivity {
     private int brojTocnihOdgovora = 0;
     private float bodovi = 0.f;
 
+    private KvizomatApp app;
+
     private long backPressed;
 
     private DecimalFormat decimalFormat;
@@ -50,6 +53,8 @@ public class KvizActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_kviz);
+
+        app = (KvizomatApp) getApplication();
 
         // Pronađi komponente kviza
         mPitanje = findViewById(R.id.pitanje);
@@ -167,7 +172,11 @@ public class KvizActivity extends AppCompatActivity {
     private void zatvoriAktivnost() {
         Toast.makeText(getApplicationContext(), "Doviđenja", Toast.LENGTH_SHORT).show();
         mKorisnik.setBodovi(mKorisnik.getBodovi() + bodovi);
-        dbKorisnici.child(mKorisnikKey).child("bodovi").setValue(mKorisnik.getBodovi() + bodovi);
+
+        app.setBodovi(mKorisnik.getBodovi());
+        app.setTrenutniKorisnik(mKorisnik);
+
+//        dbKorisnici.child(mKorisnikKey).child("bodovi").setValue(mKorisnik.getBodovi() + bodovi);
         this.finish();
     }
 

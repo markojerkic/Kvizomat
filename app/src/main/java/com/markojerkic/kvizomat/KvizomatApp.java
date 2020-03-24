@@ -54,7 +54,12 @@ public class KvizomatApp extends Application {
         if (trenutniUser == null && FirebaseAuth.getInstance().getCurrentUser() != null)
             setTrenutniUser();
         else if (trenutniUser != null) {
-            setKorisnik();
+            setKorisnik(new FirebaseKorisnikCallback() {
+                @Override
+                public void onCallback(Korisnik korisnik) {
+                    trenutniKorisnik = korisnik;
+                }
+            });
         }
 
         if (!NetworkConnection.hasConnection(this))
@@ -62,9 +67,20 @@ public class KvizomatApp extends Application {
 
     }
 
+    public void setBodovi(float bodovi) {
+        if (trenutniKorisnik != null) {
+            korisniciReference.child(trenutniKorisnik.getUid()).child("bodovi").setValue(bodovi);
+        }
+    }
+
     public void setTrenutniUser() {
         trenutniUser = FirebaseAuth.getInstance().getCurrentUser();
-        setKorisnik();
+        setKorisnik(new FirebaseKorisnikCallback() {
+            @Override
+            public void onCallback(Korisnik korisnik) {
+                trenutniKorisnik = korisnik;
+            }
+        });
     }
 
     public void setTrenutniKorisnik(Korisnik trenutniKorisnik) {
@@ -117,11 +133,6 @@ public class KvizomatApp extends Application {
     }
 
     public Korisnik getTrenutniKorisnik() {
-//        while (trenutniKorisnik == null) {
-//            Log.d("Korisnik", "trenutni korisnik još nije nađen");
-//        }
-//        Log.d("Korisnik", "trenutni korisnik je pronađen");
-
         return trenutniKorisnik;
     }
 
@@ -176,7 +187,7 @@ public class KvizomatApp extends Application {
         });
     }
 
-    public void setKorisnik() {
+    public void setKorisnik(final FirebaseKorisnikCallback callback) {
         korisniciReference.child(trenutniUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -197,6 +208,8 @@ public class KvizomatApp extends Application {
 
                 korisniciReference.child(trenutniUser.getUid()).child("online").setValue(true);
                 korisniciReference.child(trenutniUser.getUid()).child("online").onDisconnect().setValue(false);
+
+                callback.onCallback(trenutniKorisnik);
                 spremno = true;
 
             }

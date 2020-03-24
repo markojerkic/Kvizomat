@@ -30,13 +30,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
 
@@ -61,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
     private Korisnik trenutniKorisnik;
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference korisniciReference;
-    private DatabaseReference tokenDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +66,8 @@ public class MainActivity extends AppCompatActivity {
 
         app = (KvizomatApp) getApplicationContext();
 
-//        korisniciReference = firebaseDatabase.getReference("korisniciOnline");
-//        tokenDb = firebaseDatabase.getReference("korisniciToken");
-//        korisniciReference.keepSynced(true);
-//        tokenDb.keepSynced(true);
+        korisniciReference = firebaseDatabase.getReference("korisniciOnline");
+        korisniciReference.keepSynced(true);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -95,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("auth", "nema usera");
             createSignInIntent();
         } else {
-            mTrenutniUser = app.getTrenutniUser();
+            mTrenutniUser = FirebaseAuth.getInstance().getCurrentUser();
             setKorisnik();
         }
 
@@ -143,99 +135,65 @@ public class MainActivity extends AppCompatActivity {
 
     public void setKorisnik() {
 
-        FirebaseDatabase.getInstance().getReference("korisniciOnline").child(mTrenutniUser.getUid())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Korisnik k = dataSnapshot.getValue(Korisnik.class);
-                Log.d("Test s korisnikom", k.getIme());
-                trenutniKorisnik = k;
+        if (mTrenutniUser == null)
+            mTrenutniUser = FirebaseAuth.getInstance().getCurrentUser();
 
-                korisniciReference.child(trenutniKorisnik.getUid()).child("online").setValue(true);
-                FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+
+        trenutniKorisnik = app.getTrenutniKorisnik();
+        if (trenutniKorisnik == null) {
+            app.setKorisnik(new FirebaseKorisnikCallback() {
+                @Override
+                public void onCallback(Korisnik korisnik) {
+                    trenutniKorisnik = korisnik;
+                    trenutniKorisnik.setOnline(true);
+                    updateUI();
+                    if (trenutniKorisnik.getIme().equals("null_null_null")) {
+                        final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
+                        Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
+                        upisiInfoDialog.show();
+
+                        upisiTipka.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (editText.getText().toString().equals("")) {
+                                    Toast.makeText(getApplicationContext(),
+                                            "Upisite informacije", Toast.LENGTH_LONG).show();
+                                } else {
+                                    trenutniKorisnik.setIme(editText.getText().toString().trim());
+                                    app.setTrenutniKorisnik(trenutniKorisnik);
+                                }
+                                upisiInfoDialog.cancel();
+                                updateUI();
+                            }
+                        });
+
+                    }
+                }
+            });
+        } else {
+            if (trenutniKorisnik.getIme().equals("null_null_null")) {
+                final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
+                Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
+                upisiInfoDialog.show();
+
+                upisiTipka.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        String token = task.getResult().getToken();
-
-                        app.getTokenReference().child(trenutniKorisnik.getUid()).setValue(token);
+                    public void onClick(View v) {
+                        if (editText.getText().toString().equals("")) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Upisite informacije", Toast.LENGTH_LONG).show();
+                        } else {
+                            trenutniKorisnik.setIme(editText.getText().toString().trim());
+                            app.setTrenutniKorisnik(trenutniKorisnik);
+                        }
+                        upisiInfoDialog.cancel();
+                        updateUI();
                     }
                 });
 
-                korisniciReference.child(mTrenutniUser.getUid()).child("online").setValue(true);
-                korisniciReference.child(mTrenutniUser.getUid()).child("online").onDisconnect().setValue(false);
-                if (trenutniKorisnik.getIme().equals("null_null_null")) {
-                    final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
-                    Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
-                    upisiInfoDialog.show();
-
-                    upisiTipka.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (editText.getText().toString().equals("")) {
-                                Toast.makeText(getApplicationContext(),
-                                        "Upisite informacije", Toast.LENGTH_LONG).show();
-                            } else {
-                                trenutniKorisnik.setIme(editText.getText().toString().trim());
-                                app.setTrenutniKorisnik(trenutniKorisnik);
-                            }
-                            upisiInfoDialog.cancel();
-                            updateUI();
-                        }
-                    });
-                    updateUI();
-                }
-
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
-
-        if (mTrenutniUser == null)
-            mTrenutniUser = FirebaseAuth.getInstance().getCurrentUser();
-//        DatabaseReference trKorRef = korisniciReference.child(mUser.getUid());
-//        trKorRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                Korisnik k = dataSnapshot.getValue(Korisnik.class);
-//                Log.d("Test s korisnikom", k.getIme());
-//                upKor = k;
-//
-//                if (upKor.getIme().equals("null_null_null")) {
-//                    final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);
-//                    Button upisiTipka = upisiInfoDialog.findViewById(R.id.upisi_ime_tipka);
-//                    upisiInfoDialog.show();
-//
-//                    upisiTipka.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            if (editText.getText().toString().equals("")) {
-//                                Toast.makeText(getApplicationContext(),
-//                                        "Upisite informacije", Toast.LENGTH_LONG).show();
-//                            } else {
-//                                upKor.setIme(editText.getText().toString().trim());
-//                                korisniciReference.child(upKor.getUid()).setValue(upKor);
-//                            }
-//                            upisiInfoDialog.cancel();
-//                            updateUI();
-//                        }
-//                    });
-//                    updateUI();
-//                }
-//                korisniciReference.child(upKor.getUid()).child("online").setValue(true);
-//                updateUI();
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
+            updateUI();
+        }
     }
 
     @Override
@@ -245,17 +203,10 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                app.setTrenutniUser();
-//                FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-//                        String token = task.getResult().getToken();
-//
-//                        tokenDb.child(mUser.getUid()).setValue(token);
-//                    }
-//                });
                 setKorisnik();
             } else {
+                Toast.makeText(this, "Nešto je pošlo po zlu, pokušajmo ponovo",
+                        Toast.LENGTH_SHORT).show();
                 createSignInIntent();
             }
 
