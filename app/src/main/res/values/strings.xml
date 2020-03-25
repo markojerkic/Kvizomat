@@ -27,4 +27,7 @@
     <string name="moj_prijatelj">Moj prijatelj/ica</string>
     <string name="dodaj_prijatelja">Dodaj prijatelja</string>
     <string name="odustani_prijatelj">Odustani</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
