@@ -14,8 +14,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
@@ -23,6 +28,8 @@ import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -35,6 +42,7 @@ public class OnlinePrijatelji extends Fragment {
     private ListView listView;
     private OnlinePrijateljiAdapter adapter;
     private Context context;
+    private FirebaseFunctions functions;
 
     private KvizomatApp app;
     private ArrayList<Korisnik> prijatelji;
@@ -50,6 +58,7 @@ public class OnlinePrijatelji extends Fragment {
         trenutniKorisnik = app.getTrenutniKorisnik();
         korisnici = app.getListaKorisnika();
         prijatelji = app.getListaPrijatelja();
+        functions = FirebaseFunctions.getInstance();
 
         dialog = new Dialog(context);
         dialog.setContentView(R.layout.popup_korisnik);
@@ -99,9 +108,14 @@ public class OnlinePrijatelji extends Fragment {
                 igrajPopup.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (!izabraniPrijatelj.isOnline())
+                        if (!izabraniPrijatelj.isOnline()) {
                             Toast.makeText(context, "Prijatelj trenutno nije na vezi",
                                     Toast.LENGTH_SHORT).show();
+                            dialog.cancel();
+                        } else {
+                            izazovi(izabraniPrijatelj.getUid());
+                            dialog.cancel();;
+                        }
                     }
                 });
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
@@ -110,5 +124,18 @@ public class OnlinePrijatelji extends Fragment {
         });
 
         return view;
+    }
+
+    private void izazovi(String protivnik) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("protivnik", protivnik);
+        data.put("mojUid", trenutniKorisnik.getUid());
+
+        functions.getHttpsCallable("sendSpecific").call(data).addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
+            @Override
+            public void onComplete(@NonNull Task<HttpsCallableResult> task) {
+                Toast.makeText(context, "Zahtjev poslan", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

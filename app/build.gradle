@@ -13,8 +13,9 @@ android {
         applicationId "com.markojerkic.kvizomat"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 5
-        versionName "Alpha 1.004"
+        // Doano je 25. ožujka
+        versionCode 6
+        versionName "Alpha 1.005"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

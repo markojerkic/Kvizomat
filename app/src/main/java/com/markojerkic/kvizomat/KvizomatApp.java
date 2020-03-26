@@ -2,6 +2,7 @@ package com.markojerkic.kvizomat;
 
 import android.app.Application;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -171,6 +172,18 @@ public class KvizomatApp extends Application {
     public void setListaPrijatelja(ArrayList<String> prijatelji) {
         trenutniKorisnik.setPrijatelji(prijatelji);
         korisniciReference.child(trenutniKorisnik.getUid()).child("prijatelji").setValue(prijatelji);
+    }
+
+    public Korisnik findPrijatelj(String uid) {
+        Korisnik rez;
+        for (Korisnik k: listaPrijatelja) {
+            if (k.getUid().equals(k.getUid()))
+                return k;
+        }
+
+        Toast.makeText(getApplicationContext(),
+                "Prijatelj nije pronađen", Toast.LENGTH_SHORT).show();
+        return null;
     }
 
     public void setListaKorisnika() {
