@@ -4,6 +4,6 @@ import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 
 public interface FirebaseKorisnikCallback {
 
-    public void onCallback(Korisnik korisnik);
+    void onCallback(Korisnik korisnik);
 
 }

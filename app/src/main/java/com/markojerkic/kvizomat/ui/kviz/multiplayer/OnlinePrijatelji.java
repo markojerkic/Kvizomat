@@ -16,11 +16,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
+import com.markojerkic.kvizomat.FirebaseKorisnikCallback;
 import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
@@ -49,6 +51,7 @@ public class OnlinePrijatelji extends Fragment {
     private ArrayList<Korisnik> korisnici;
     private Korisnik trenutniKorisnik;
     private Dialog dialog;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     public OnlinePrijatelji(Context context) {
@@ -69,6 +72,22 @@ public class OnlinePrijatelji extends Fragment {
         return fragment;
     }
 
+    public void updatePrijatelji() {
+        app.updateOnlinePrijatelji(new FirebaseKorisnikCallback() {
+            @Override
+            public void onCallback(Korisnik korisnik) {
+                for (Korisnik k: prijatelji) {
+                    if (k.getUid().equals(korisnik.getUid())) {
+                        k.setOnline(korisnik.isOnline());
+                        k.setBodovi(korisnik.getBodovi());
+                        adapter.notifyDataSetChanged();
+                        listView.setAdapter(adapter);
+                    }
+                }
+            }
+        });
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +100,7 @@ public class OnlinePrijatelji extends Fragment {
         View view = inflater.inflate(R.layout.fragment_online_prijatelji, container, false);
 
         listView = view.findViewById(R.id.online_prijatlji_listview_multiplayer);
-        adapter = new OnlinePrijateljiAdapter(prijatelji, getContext(), trenutniKorisnik);
+        adapter = new OnlinePrijateljiAdapter(prijatelji, context, trenutniKorisnik);
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
@@ -102,6 +121,7 @@ public class OnlinePrijatelji extends Fragment {
                 odustaniPopup.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        updatePrijatelji();
                         dialog.cancel();
                     }
                 });

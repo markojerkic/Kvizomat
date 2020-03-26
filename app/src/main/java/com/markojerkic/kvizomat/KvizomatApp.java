@@ -107,10 +107,6 @@ public class KvizomatApp extends Application {
     }
 
     public FirebaseUser getTrenutniUser() {
-
-        while (trenutniUser == null) {
-            Log.d("Korisnik", "trenutni user još nije spreman");
-        }
         Log.d("Korisnik", "trenutni user je spreman");
         return trenutniUser;
     }
@@ -174,6 +170,23 @@ public class KvizomatApp extends Application {
         korisniciReference.child(trenutniKorisnik.getUid()).child("prijatelji").setValue(prijatelji);
     }
 
+    public void updateOnlinePrijatelji(final FirebaseKorisnikCallback korisnikCallback) {
+        for (Korisnik prijatelj: listaPrijatelja) {
+            korisniciReference.child(prijatelj.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Korisnik k = dataSnapshot.getValue(Korisnik.class);
+                    korisnikCallback.onCallback(k);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
     public Korisnik findPrijatelj(String uid) {
         Korisnik rez;
         for (Korisnik k: listaPrijatelja) {
@@ -208,37 +221,39 @@ public class KvizomatApp extends Application {
     }
 
     public void setKorisnik(final FirebaseKorisnikCallback callback) {
-        korisniciReference.child(trenutniUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Korisnik k = dataSnapshot.getValue(Korisnik.class);
-                Log.d("Test s korisnikom", k.getIme());
-                trenutniKorisnik = k;
+        if (trenutniUser != null) {
+            korisniciReference.child(trenutniUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Korisnik k = dataSnapshot.getValue(Korisnik.class);
+                    Log.d("Test s korisnikom", k.getIme());
+                    trenutniKorisnik = k;
 
-                korisniciReference.child(trenutniKorisnik.getUid()).child("online").setValue(true);
-                setListaKorisnika();
-                FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        String token = task.getResult().getToken();
+                    korisniciReference.child(trenutniKorisnik.getUid()).child("online").setValue(true);
+                    setListaKorisnika();
+                    FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                            String token = task.getResult().getToken();
 
-                        tokenReference.child(trenutniKorisnik.getUid()).setValue(token);
-                    }
-                });
+                            tokenReference.child(trenutniKorisnik.getUid()).setValue(token);
+                        }
+                    });
 
-                korisniciReference.child(trenutniUser.getUid()).child("online").setValue(true);
-                korisniciReference.child(trenutniUser.getUid()).child("online").onDisconnect().setValue(false);
+                    korisniciReference.child(trenutniUser.getUid()).child("online").setValue(true);
+                    korisniciReference.child(trenutniUser.getUid()).child("online").onDisconnect().setValue(false);
 
-                callback.onCallback(trenutniKorisnik);
-                spremno = true;
+                    callback.onCallback(trenutniKorisnik);
+                    spremno = true;
 
-            }
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
     }
 
     public DatabaseReference getTokenReference() {

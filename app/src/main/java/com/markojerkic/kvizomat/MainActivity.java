@@ -2,6 +2,9 @@ package com.markojerkic.kvizomat;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private Dialog infoDialog;
 
     private Dialog upisiInfoDialog;
+    private Dialog izazovDialog;
 
     private KvizomatApp app;
 
@@ -60,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        Bundle extras = getIntent().getExtras();
         app = (KvizomatApp) getApplicationContext();
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -100,6 +106,41 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+        if (extras != null) {
+            String izazivac = (String) extras.get("izazov");
+            if (izazivac != null) {
+                Log.d("izazivac", izazivac);
+                Toast.makeText(this, izazivac + " vas je izazvao", Toast.LENGTH_SHORT).show();
+                izazovDialog = new Dialog(this);
+                izazovDialog.setContentView(R.layout.popup_korisnik);
+                TextView imeIzazov = izazovDialog.findViewById(R.id.korisnik_popup_ime);
+                Button prihvati = izazovDialog.findViewById(R.id.dodaj_prijatelja);
+                Button odustani = izazovDialog.findViewById(R.id.odustani_prijatelj);
+
+                prihvati.setText("Prihvati");
+                imeIzazov.setText(izazivac + "\nvas izaziva na dvoboj");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    imeIzazov.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                }
+                prihvati.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        izazovDialog.cancel();
+                    }
+                });
+                odustani.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        izazovDialog.cancel();
+                    }
+                });
+                izazovDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                izazovDialog.show();
+            }
+        }
+
     }
 
     private void odjava() {
@@ -196,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
+                app.setTrenutniUser();
                 setKorisnik();
             } else {
                 Toast.makeText(this, "Nešto je pošlo po zlu, pokušajmo ponovo",

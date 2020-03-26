@@ -181,7 +181,8 @@ public class HomeFragment extends Fragment {
         super.onResume();
         if (mTrenutniUser == null) {
             mTrenutniUser = app.getTrenutniUser();
-            findKorisnik();
+            if (mTrenutniUser != null)
+                findKorisnik();
         }
     }
 
