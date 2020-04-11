@@ -11,6 +11,8 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 
+import java.util.Map;
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
@@ -18,7 +20,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Log.d("Test", remoteMessage.getNotification().getBody());
 
         KvizomatApp app = (KvizomatApp) getApplication();
-        Korisnik izazivac = app.findPrijatelj(remoteMessage.getData().get("mojUid"));
+
+        Map<String, String> messageData = remoteMessage.getData();
+        String s =  messageData.toString();
+        Korisnik izazivac = app.findPrijatelj(remoteMessage.getData().get("izazivatelj"));
+        String mojUid = remoteMessage.getData().get("protivnik");
+        String kviz = remoteMessage.getData().get("kviz");
+        Log.d("izazov", mojUid);
+        Log.d("izazov", kviz);
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("izazov", izazivac.getIme());

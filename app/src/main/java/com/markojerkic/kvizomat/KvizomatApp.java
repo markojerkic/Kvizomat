@@ -133,8 +133,12 @@ public class KvizomatApp extends Application {
         });
     }
 
-    public Korisnik getTrenutniKorisnik() {
-        return trenutniKorisnik;
+    public void getTrenutniKorisnik(FirebaseKorisnikCallback callback) {
+        if (trenutniKorisnik != null) {
+            callback.onCallback(trenutniKorisnik);
+        } else {
+            setKorisnik(callback);
+        }
     }
 
     public void napraviListuPrijatelja() {
@@ -190,7 +194,7 @@ public class KvizomatApp extends Application {
     public Korisnik findPrijatelj(String uid) {
         Korisnik rez;
         for (Korisnik k: listaPrijatelja) {
-            if (k.getUid().equals(k.getUid()))
+            if (k.getUid().equals(uid))
                 return k;
         }
 

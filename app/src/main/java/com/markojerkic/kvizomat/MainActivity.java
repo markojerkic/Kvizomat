@@ -173,7 +173,12 @@ public class MainActivity extends AppCompatActivity {
             mTrenutniUser = FirebaseAuth.getInstance().getCurrentUser();
 
 
-        trenutniKorisnik = app.getTrenutniKorisnik();
+        app.getTrenutniKorisnik(new FirebaseKorisnikCallback() {
+            @Override
+            public void onCallback(Korisnik korisnik) {
+                trenutniKorisnik = korisnik;
+            }
+        });
         if (trenutniKorisnik == null) {
             app.setKorisnik(new FirebaseKorisnikCallback() {
                 @Override

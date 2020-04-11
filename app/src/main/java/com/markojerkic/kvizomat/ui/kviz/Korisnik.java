@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class Korisnik implements Serializable {
     private String ime, email, uid, uri;
     private ArrayList<String> prijatelji;
+    private ArrayList<String> onlineKvizovi;
     private float bodovi;
     private boolean online;
 
@@ -20,6 +21,18 @@ public class Korisnik implements Serializable {
         this.prijatelji = prijatelji;
         this.bodovi = bodovi;
         this.online = online;
+    }
+
+    public Korisnik(String ime, String email, String uri, String uid,
+                    ArrayList<String> prijatelji, float bodovi, boolean online, ArrayList<String> onlineKvizovi) {
+        this.ime = ime;
+        this.email = email;
+        this.uri = uri;
+        this.uid = uid;
+        this.prijatelji = prijatelji;
+        this.bodovi = bodovi;
+        this.online = online;
+        this.onlineKvizovi = onlineKvizovi;
     }
 
     public Korisnik(String ime, String email, String uri, String uid,
@@ -39,6 +52,14 @@ public class Korisnik implements Serializable {
 
     public void setOnline(boolean online) {
         this.online = online;
+    }
+
+    public ArrayList<String> getOnlineKvizovi() {
+        return onlineKvizovi;
+    }
+
+    public void setOnlineKvizovi(ArrayList<String> onlineKvizovi) {
+        this.onlineKvizovi = onlineKvizovi;
     }
 
     public String getEmail() {

@@ -13,10 +13,14 @@
         android:supportsRtl="true"
         android:name=".KvizomatApp"
         android:theme="@style/AppTheme">
+
+
+        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id"/>
+
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">
-
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

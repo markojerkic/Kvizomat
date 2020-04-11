@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.markojerkic.kvizomat.FirebaseKorisnikCallback;
 import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.ListaKorisnikaAdapter;
@@ -106,8 +107,13 @@ public class DodajPrijateljaFragment extends Fragment {
         });
 
         korisnici = app.getListaKorisnika();
-        trenutniKorisnik = app.getTrenutniKorisnik();
-        prijateljiString = trenutniKorisnik.getPrijatelji();
+        app.getTrenutniKorisnik(new FirebaseKorisnikCallback() {
+            @Override
+            public void onCallback(Korisnik korisnik) {
+                trenutniKorisnik = korisnik;
+                prijateljiString = trenutniKorisnik.getPrijatelji();
+            }
+        });
 
         listaKorisnikaAdapter = new ListaKorisnikaAdapter(korisnici, getContext(), trenutniKorisnik);
         listaView.setAdapter(listaKorisnikaAdapter);

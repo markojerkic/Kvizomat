@@ -58,7 +58,12 @@ public class OnlinePrijatelji extends Fragment {
         // Required empty public constructor
         this.context = context;
         app = (KvizomatApp) context.getApplicationContext();
-        trenutniKorisnik = app.getTrenutniKorisnik();
+        app.getTrenutniKorisnik(new FirebaseKorisnikCallback() {
+            @Override
+            public void onCallback(Korisnik korisnik) {
+                trenutniKorisnik = korisnik;
+            }
+        });
         korisnici = app.getListaKorisnika();
         prijatelji = app.getListaPrijatelja();
         functions = FirebaseFunctions.getInstance();
@@ -134,7 +139,7 @@ public class OnlinePrijatelji extends Fragment {
                             dialog.cancel();
                         } else {
                             izazovi(izabraniPrijatelj.getUid());
-                            dialog.cancel();;
+                            dialog.cancel();
                         }
                     }
                 });

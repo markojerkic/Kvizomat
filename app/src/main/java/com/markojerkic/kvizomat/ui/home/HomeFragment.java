@@ -89,7 +89,7 @@ public class HomeFragment extends Fragment {
 //        }).isComplete();
 
         decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);;
+        decimalFormat.setMaximumFractionDigits(2);
 
         // Database listener
         mListaPitanja = new ArrayList<>();
@@ -187,7 +187,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void findKorisnik() {
-        mTrenutniKorisnik = app.getTrenutniKorisnik();
+        app.getTrenutniKorisnik(new FirebaseKorisnikCallback() {
+            @Override
+            public void onCallback(Korisnik korisnik) {
+                mTrenutniKorisnik = korisnik;
+            }
+        });
         if (mTrenutniKorisnik == null) {
             app.setKorisnik(new FirebaseKorisnikCallback() {
                 @Override
@@ -245,9 +250,6 @@ public class HomeFragment extends Fragment {
     }
     
     private boolean provjeriDodajPitanje(ArrayList<Pitanje> pitanjaRez, Pitanje trPit) {
-        if (!pitanjaRez.contains(trPit)) {
-            return true;
-        }
-        return false;
+        return !pitanjaRez.contains(trPit);
     }
 }
