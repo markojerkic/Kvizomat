@@ -3,12 +3,14 @@ package com.markojerkic.kvizomat.ui.home;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +33,8 @@ import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.markojerkic.kvizomat.ui.kviz.KvizActivity;
 import com.markojerkic.kvizomat.ui.kviz.KvizInformacije;
 import com.markojerkic.kvizomat.ui.kviz.Pitanje;
+import com.markojerkic.kvizomat.ui.kviz.multiplayer.Kviz;
+import com.markojerkic.kvizomat.ui.kviz.multiplayer.ListaKvizovaCallback;
 import com.markojerkic.kvizomat.ui.kviz.multiplayer.MultiplayerKviz;
 
 import java.text.DecimalFormat;
@@ -54,6 +58,7 @@ public class HomeFragment extends Fragment {
     private Button mSoloIgra;
     private Button mIgraProtivPrijatelja;
     private TextView mBrojBodovaUkupni;
+    private LinearLayout mHomeLinearLayout;
     private Dialog upisiInfoDialog;
 
     private KvizomatApp app;
@@ -62,6 +67,7 @@ public class HomeFragment extends Fragment {
     private Korisnik mTrenutniKorisnik;
     private String korisnikKey;
     private DecimalFormat decimalFormat;
+    private ArrayList<Kviz> listaKvizova;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -77,6 +83,7 @@ public class HomeFragment extends Fragment {
         mSoloIgra = root.findViewById(R.id.last_man_button);
         mIgraProtivPrijatelja = root.findViewById(R.id.friendly_quitz_button);
         mBrojBodovaUkupni = root.findViewById(R.id.ukupan_br_bodova);
+        mHomeLinearLayout = root.findViewById(R.id.home_linear_layout);
 
 
 //        mFunction.getHttpsCallable("sendNotification")
@@ -192,6 +199,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onCallback(Korisnik korisnik) {
                 mTrenutniKorisnik = korisnik;
+                getKvizovi();
             }
         });
         if (mTrenutniKorisnik == null) {
@@ -207,6 +215,22 @@ public class HomeFragment extends Fragment {
         } else {
             float bodovi = mTrenutniKorisnik.getBodovi();
             mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(bodovi));
+        }
+    }
+
+    private void dodajPrijatelje() {
+        ArrayList<View> prijateljiView = new ArrayList<>();
+
+        for (Korisnik prijatelj: app.getListaPrijatelja()) {
+            TextView t = new TextView(getContext());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                t.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            }
+            t.setText(prijatelj.getIme());
+            t.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            prijateljiView.add(t);
+            mHomeLinearLayout.addView(t);
         }
     }
 
@@ -252,5 +276,15 @@ public class HomeFragment extends Fragment {
     
     private boolean provjeriDodajPitanje(ArrayList<Pitanje> pitanjaRez, Pitanje trPit) {
         return !pitanjaRez.contains(trPit);
+    }
+
+    private void getKvizovi() {
+        app.napraviListuKvizova(new ListaKvizovaCallback() {
+            @Override
+            public void onListaGotova(ArrayList<Kviz> lKviz) {
+                listaKvizova = lKviz;
+                Log.d("kvizovi", listaKvizova.toString());
+            }
+        });
     }
 }

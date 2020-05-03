@@ -19,6 +19,8 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.markojerkic.kvizomat.ui.kviz.Pitanje;
+import com.markojerkic.kvizomat.ui.kviz.multiplayer.Kviz;
+import com.markojerkic.kvizomat.ui.kviz.multiplayer.ListaKvizovaCallback;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +32,9 @@ public class KvizomatApp extends Application {
     private DatabaseReference korisniciReference;
     private DatabaseReference pitanjaReference;
     private DatabaseReference tokenReference;
+    private DatabaseReference kvizoviReference;
     private ArrayList<Pitanje> listaPitanja;
+    private FirebaseDatabase database;
 
     public static boolean spremno = false;
 
@@ -38,19 +42,23 @@ public class KvizomatApp extends Application {
     private FirebaseUser trenutniUser;
     private ArrayList<Korisnik> listaKorisnika;
     private ArrayList<Korisnik> listaPrijatelja;
+    private ArrayList<Kviz> listaKvizova;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        database = FirebaseDatabase.getInstance();
+        database.setPersistenceEnabled(true);
 
-        korisniciReference = FirebaseDatabase.getInstance().getReference("korisniciOnline");
-        pitanjaReference = FirebaseDatabase.getInstance().getReference("pitanja");
-        tokenReference = FirebaseDatabase.getInstance().getReference("korisniciToken");
+        korisniciReference = database.getReference("korisniciOnline");
+        pitanjaReference = database.getReference("pitanja");
+        tokenReference = database.getReference("korisniciToken");
+        kvizoviReference = database.getReference("onlineKvizovi");
         korisniciReference.keepSynced(true);
         pitanjaReference.keepSynced(true);
         tokenReference.keepSynced(true);
+        kvizoviReference.keepSynced(true);
 
         if (trenutniUser == null && FirebaseAuth.getInstance().getCurrentUser() != null)
             setTrenutniUser();
@@ -248,6 +256,13 @@ public class KvizomatApp extends Application {
                     korisniciReference.child(trenutniUser.getUid()).child("online").onDisconnect().setValue(false);
 
                     callback.onCallback(trenutniKorisnik);
+                    napraviListuKvizova(new ListaKvizovaCallback() {
+                        @Override
+                        public void onListaGotova(ArrayList<Kviz> lk) {
+                            listaKvizova = lk;
+                            setListaKorisnika();
+                        }
+                    });
                     spremno = true;
 
                 }
@@ -262,5 +277,32 @@ public class KvizomatApp extends Application {
 
     public DatabaseReference getTokenReference() {
         return tokenReference;
+    }
+
+
+
+    public void napraviListuKvizova(final ListaKvizovaCallback callback) {
+        if (listaKvizova != null) {
+            callback.onListaGotova(listaKvizova);
+        } else {
+            final ArrayList<Kviz> kList = new ArrayList<>();
+            kvizoviReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                        if (trenutniKorisnik.getOnlineKvizovi().contains(ds.getKey())) {
+                            Kviz k = new Kviz(ds, trenutniKorisnik.getUid());
+                            kList.add(k);
+                        }
+                    }
+                    callback.onListaGotova(kList);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 }
