@@ -138,9 +138,9 @@ public class OnlinePrijatelji extends Fragment {
                                     Toast.LENGTH_SHORT).show();
                             dialog.cancel();
                         } else {
-                            izazovi(izabraniPrijatelj.getUid());
                             dialog.cancel();
                         }
+                        izazovi(izabraniPrijatelj.getUid());
                     }
                 });
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));

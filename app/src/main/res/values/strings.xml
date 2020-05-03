@@ -19,6 +19,9 @@
 
     <string name="home_second">Home Second</string>
 
+    <string name="postavljanje_pitanja">Postavljamo vam pitanja</string>
+    <string name="ulazak_u_igru_toast">Idemo na pitanja</string>
+
     <string name="title_activity_kviz">Kviz</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>

@@ -129,6 +129,7 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 final Intent pitanjeActivity = new Intent(getActivity(), KvizActivity.class);
                 final ArrayList<Pitanje> pitanja = new ArrayList<>();
+                Toast.makeText(getActivity(), R.string.postavljanje_pitanja, Toast.LENGTH_SHORT).show();
                 if (NetworkConnection.hasConnection(getContext())) {
 
                     Task<HttpsCallableResult> task = getCloudPitanja();
@@ -145,7 +146,7 @@ public class HomeFragment extends Fragment {
                             pitanjeActivity.putExtra("korisnik", mTrenutniKorisnik);
                             pitanjeActivity.putExtra("korisnikKey", korisnikKey);
                             startActivity(pitanjeActivity);
-                            Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {
@@ -156,7 +157,7 @@ public class HomeFragment extends Fragment {
                     pitanjeActivity.putExtra("korisnik", mTrenutniKorisnik);
                     pitanjeActivity.putExtra("korisnikKey", korisnikKey);
                     startActivity(pitanjeActivity);
-                    Toast.makeText(getActivity(), "Idemo na pitanje!!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
                 }
             }
         });
