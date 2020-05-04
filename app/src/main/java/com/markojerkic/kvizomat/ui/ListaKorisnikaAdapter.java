@@ -9,7 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
@@ -66,7 +65,7 @@ public class ListaKorisnikaAdapter extends BaseAdapter {
         }
         email.setText(k.getEmail());
 
-        if (!k.getUri().equals("null") && NetworkConnection.hasConnection(context))
+        if (ProvjeraVeze.provjeriSlika(k, context))
             Picasso.get().load(k.getUri()).into(slika);
 
         if (k.getUid().equals(trKor.getUid())) {

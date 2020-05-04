@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@mipmap/ic_launcher"
+        android:id="@+id/slika_korisnika"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ime_korisnika"
+        android:text="Ime"
+        android:fontFamily="@font/raleway_bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bodovi_online_tekst"
+        app:layout_constraintEnd_toStartOf="@+id/slika_korisnika"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginRight="25dp"
+        android:textSize="25dp"
+        android:textColor="@color/colorPrimaryDark"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bodovi_online_tekst"
+        android:text="Bodovi"
+        android:fontFamily="@font/raleway_medium"
+        app:layout_constraintTop_toBottomOf="@+id/ime_korisnika_list"
+        app:layout_constraintBottom_toTopOf="@id/zapoceo_kviz_tekst"
+        app:layout_constraintEnd_toStartOf="@+id/slika_korisnika"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="5dp"
+        android:textSize="15dp"
+        android:textColor="@color/colorPrimaryDark"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/bodovi_online_tekst"
+        app:layout_constraintEnd_toStartOf="@id/slika_korisnika"
+        app:layout_constraintStart_toStartOf="parent"
+        android:fontFamily="@font/raleway_medium"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="5dp"
+        android:id="@+id/zapoceo_kviz_tekst"
+        android:textColor="@color/colorPrimaryDark"
+        android:text="Započeto/završeno"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

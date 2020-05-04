@@ -199,8 +199,18 @@ public class KvizomatApp extends Application {
         }
     }
 
+    public Korisnik findKorisnik(String uid) {
+        for (Korisnik k: listaKorisnika) {
+            if (k.getUid().equals(uid))
+                return k;
+        }
+
+        Toast.makeText(getApplicationContext(),
+                String.format("Korisnik {} nije pronađen", uid), Toast.LENGTH_SHORT).show();
+        return null;
+    }
+
     public Korisnik findPrijatelj(String uid) {
-        Korisnik rez;
         for (Korisnik k: listaPrijatelja) {
             if (k.getUid().equals(uid))
                 return k;

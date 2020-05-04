@@ -1,6 +1,7 @@
 package com.markojerkic.kvizomat.ui.home;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +31,7 @@ import com.markojerkic.kvizomat.FirebaseKorisnikCallback;
 import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
+import com.markojerkic.kvizomat.ui.ProvjeraVeze;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.markojerkic.kvizomat.ui.kviz.KvizActivity;
 import com.markojerkic.kvizomat.ui.kviz.KvizInformacije;
@@ -36,6 +39,7 @@ import com.markojerkic.kvizomat.ui.kviz.Pitanje;
 import com.markojerkic.kvizomat.ui.kviz.multiplayer.Kviz;
 import com.markojerkic.kvizomat.ui.kviz.multiplayer.ListaKvizovaCallback;
 import com.markojerkic.kvizomat.ui.kviz.multiplayer.MultiplayerKviz;
+import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -45,6 +49,7 @@ import java.util.Random;
 public class HomeFragment extends Fragment {
 
     private static final int BROJ_PITANJA_PO_KATEGORIJI = 3;
+    private static final int BROJ_KVIZOVA_PRIKAZATI = 10;
     private ArrayList<Pitanje> mListaPitanja;
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -284,7 +289,48 @@ public class HomeFragment extends Fragment {
             public void onListaGotova(ArrayList<Kviz> lKviz) {
                 listaKvizova = lKviz;
                 Log.d("kvizovi", listaKvizova.toString());
+                prikaziKvizove(BROJ_KVIZOVA_PRIKAZATI);
             }
         });
+    }
+
+    private void prikaziKvizove(int brojKvizovaPrikazati) {
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ArrayList<View> listaKvizView = new ArrayList<>();
+        if (listaKvizova.size() >= 1) {
+            View onlineKvizoviNaslov = inflater.inflate(R.layout.naslov_online_kvizovi, null);
+            mHomeLinearLayout.addView(onlineKvizoviNaslov);
+            int br = Math.min(listaKvizova.size(), brojKvizovaPrikazati);
+            for (int i = 0; i < br; i++) {
+                inflateOnlineKviz(listaKvizView, listaKvizova.get(i), inflater);
+            }
+        }
+    }
+
+    private void inflateOnlineKviz(ArrayList<View> listaKvizView, Kviz kviz, LayoutInflater inflater) {
+        View v = inflater.inflate(R.layout.online_kviz_view, null);
+        Korisnik izaz = app.findKorisnik(kviz.getIzazivacUid());
+
+        TextView ime = v.findViewById(R.id.ime_korisnika);
+        try {
+            ime.setText(izaz.getIme());
+
+            TextView bodovi = v.findViewById(R.id.bodovi_online_tekst);
+            bodovi.setText("0000");
+
+            TextView rijeseno = v.findViewById(R.id.zapoceo_kviz_tekst);
+            rijeseno.setText("Nisi rijesio");
+
+            ImageView slika = v.findViewById(R.id.slika_korisnika);
+            if (ProvjeraVeze.provjeriSlika(izaz, getContext()))
+                Picasso.get().load(izaz.getUri()).into(slika);
+
+            listaKvizView.add(v);
+            mHomeLinearLayout.addView(v);
+        } catch (Exception e) {
+            if (izaz != null)
+                Log.d("Iznimka", izaz.toString());
+        }
+
     }
 }

@@ -9,7 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.squareup.picasso.Picasso;
@@ -59,13 +58,13 @@ public class RangListaPrijateljaAdapter extends BaseAdapter {
         TextView rang = convertView.findViewById(R.id.leaderboard_rang);
 
         ime.setText(k.getIme());
-        rang.setText("#" + String.valueOf(position+1));
+        rang.setText("#" + (position + 1));
         Log.d("prijatelj", String.valueOf(trKor.getPrijatelji().contains(k.getUid())));
 
         brojBodova.setText("Broj bodova: " + k.getBodovi());
 
         email.setText(k.getEmail());
-        if (!k.getUri().equals("null") && NetworkConnection.hasConnection(context))
+        if (ProvjeraVeze.provjeriSlika(k, context))
             Picasso.get().load(k.getUri()).into(slika);
 
         if (k.getUid().equals(trKor.getUid())) {

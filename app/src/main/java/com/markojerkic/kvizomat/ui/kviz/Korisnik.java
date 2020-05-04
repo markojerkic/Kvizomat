@@ -1,5 +1,7 @@
 package com.markojerkic.kvizomat.ui.kviz;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -108,5 +110,20 @@ public class Korisnik implements Serializable {
 
     public void setPrijatelji(ArrayList<String> prijatelji) {
         this.prijatelji = prijatelji;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        String rez = "";
+        rez += "Ime: " + this.ime;
+        rez += "\nemail: " + this.email;
+        rez += "\nuid: " + this.uid;
+        rez += "\nuri: " + this.uri;
+        rez += "\nbodovi: " + this.bodovi;
+        rez += "\nprijatelji: " + this.prijatelji.toString();
+        rez += "\n++\n";
+
+        return rez;
     }
 }
