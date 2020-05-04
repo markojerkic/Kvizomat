@@ -17,10 +17,11 @@ public class Kviz implements Serializable {
         this.izazivacUid = (String)  ds.child("kor2").getValue();
         this.pitanja = (ArrayList<Pitanje>) ds.child("kvizPitanja").child("result").getValue();
 
-        if (trKorisnikUid != trKorisnikKey) {
-            String t = trKorisnikUid;
-            trKorisnikUid = izazivacUid;
-            izazivacUid = t;
+        if (!this.trKorisnikUid.equals(trKorisnikKey)) {
+
+            String t = this.trKorisnikUid;
+            this.trKorisnikUid = this.izazivacUid;
+            this.izazivacUid = t;
         }
     }
 

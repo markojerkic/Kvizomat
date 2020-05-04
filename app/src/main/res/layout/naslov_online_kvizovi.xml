@@ -11,7 +11,7 @@
         android:text="@string/online_kvizovi_naslov"
         android:textSize="35dp"
         android:fontFamily="@font/raleway_bold"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorPrimaryDark"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
