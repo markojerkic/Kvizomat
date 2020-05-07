@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 }
-            });
+            }, false);
         } else {
             if (trenutniKorisnik.getIme().equals("null_null_null")) {
                 final EditText editText = upisiInfoDialog.findViewById(R.id.upisi_ime);

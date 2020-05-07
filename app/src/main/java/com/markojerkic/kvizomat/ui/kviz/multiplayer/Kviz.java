@@ -1,6 +1,7 @@
 package com.markojerkic.kvizomat.ui.kviz.multiplayer;
 
 import com.google.firebase.database.DataSnapshot;
+import com.markojerkic.kvizomat.ui.kviz.Bodovi;
 import com.markojerkic.kvizomat.ui.kviz.Pitanje;
 
 import java.io.Serializable;
@@ -10,10 +11,10 @@ import java.util.HashMap;
 public class Kviz implements Serializable {
     private ArrayList<Pitanje> pitanja;
     private String trKorisnikUid, izazivacUid;
-    private ArrayList<Integer> odgovoriTrKor;
-    private ArrayList<Integer> odgovoriIzazivac;
+    private ArrayList<Integer> odgovoriTrKor, odgKor1;
+    private ArrayList<Integer> odgovoriIzazivac, odgKor2;
     private String key;
-
+    private boolean zamjenjeno = false;
     private float bodTr, bodIza;
 
     public Kviz() {}
@@ -38,7 +39,8 @@ public class Kviz implements Serializable {
         }
 
         if (ds.child("odgovoriKor1").exists()) {
-            this.odgovoriTrKor = new ArrayList<>();
+            this.odgKor1 = new ArrayList<>();
+            this.odgovoriTrKor = this.odgKor1;
             for (Long l: (ArrayList<Long>) ds.child("odgovoriKor1").getValue()) {
                 this.odgovoriTrKor.add(l.intValue());
             }
@@ -46,7 +48,8 @@ public class Kviz implements Serializable {
             this.bodTr = izracunajBodove(this.odgovoriTrKor);
         }
         if (ds.child("odgovoriKor2").exists()) {
-            this.odgovoriIzazivac = new ArrayList<>();
+            this.odgKor2 = new ArrayList<>();
+            this.odgovoriIzazivac = this.odgKor2;
             for (Long l: (ArrayList<Long>) ds.child("odgovoriKor2").getValue()) {
                 this.odgovoriIzazivac.add(l.intValue());
             }
@@ -55,7 +58,7 @@ public class Kviz implements Serializable {
         }
 
         if (!this.trKorisnikUid.equals(trKorisnikKey)) {
-
+            zamjenjeno = true;
             String t = this.trKorisnikUid;
             this.trKorisnikUid = this.izazivacUid;
             this.izazivacUid = t;
@@ -135,25 +138,20 @@ public class Kviz implements Serializable {
         HashMap<String, Object> t = new HashMap<>();
         t.put("result", this.getPitanja());
         map.put("kvizPitanja", t);
-        if (this.odgovoriIzazivac != null)
+        if (this.odgovoriIzazivac != null && !zamjenjeno)
             map.put("odgovoriKor2", this.odgovoriIzazivac);
-        if (this.odgovoriTrKor != null)
+        else
+            map.put("odgovoriKor2", this.odgovoriTrKor);
+        if (this.odgovoriTrKor != null && !zamjenjeno)
             map.put("odgovoriKor1", this.odgovoriTrKor);
+        else
+            map.put("odgovoriKor1", this.odgovoriIzazivac);
 
         return map;
     }
 
     private float izracunajBodove(ArrayList<Integer> odgovori) {
-        float rez = 0f;
-        for (int i = 0; i < odgovori.size()/4; i++) {
-            float z = 0f;
-            for (int j = 0; j < 3; j++) {
-                Integer o1 = odgovori.get(i + j);
-                int o2 = this.pitanja.get(i + j).getTocanOdgovor();
-                z += (o1.intValue() == o2)? 1f: 0f;
-            }
-            rez += z * (i+1) * 0.7f;
-        }
+        float rez = Bodovi.izracunajBodove(pitanja, odgovori);
         return rez;
     }
 

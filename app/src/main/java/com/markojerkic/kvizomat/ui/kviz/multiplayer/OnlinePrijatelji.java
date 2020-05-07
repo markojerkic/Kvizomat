@@ -2,8 +2,10 @@ package com.markojerkic.kvizomat.ui.kviz.multiplayer;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,8 @@ import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
+import com.markojerkic.kvizomat.ui.kviz.KvizActivity;
+import com.markojerkic.kvizomat.ui.kviz.KvizInformacije;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -133,13 +137,6 @@ public class OnlinePrijatelji extends Fragment {
                 igrajPopup.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (!izabraniPrijatelj.isOnline()) {
-                            Toast.makeText(context, "Prijatelj trenutno nije na vezi",
-                                    Toast.LENGTH_SHORT).show();
-                            dialog.cancel();
-                        } else {
-                            dialog.cancel();
-                        }
                         izazovi(izabraniPrijatelj.getUid());
                     }
                 });
@@ -159,7 +156,24 @@ public class OnlinePrijatelji extends Fragment {
         functions.getHttpsCallable("sendSpecific").call(data).addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
             @Override
             public void onComplete(@NonNull Task<HttpsCallableResult> task) {
-                Toast.makeText(context, "Zahtjev poslan", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Zahtjev poslan, spremamo vam pitanja", Toast.LENGTH_SHORT).show();
+                String key = (String) task.getResult().getData();
+                otvoriOnlineKviz(key);
+                Log.d("Izazov", key);
+            }
+        });
+    }
+
+    private void otvoriOnlineKviz(String key) {
+        app.pronadiKviz(key, new ListaKvizovaCallback() {
+            @Override
+            public void onListaGotova(ArrayList<Kviz> listaKvizova) {
+                Intent intent = new Intent(getActivity(), KvizActivity.class);
+                Kviz k = listaKvizova.get(0);
+                intent.putExtra("pitanja", new KvizInformacije(k, true, k.getKey()));
+                intent.putExtra("korisnik", trenutniKorisnik);
+                startActivity(intent);
+
             }
         });
     }

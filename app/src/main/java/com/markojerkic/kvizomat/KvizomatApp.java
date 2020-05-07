@@ -70,7 +70,7 @@ public class KvizomatApp extends Application {
                 public void onCallback(Korisnik korisnik) {
                     trenutniKorisnik = korisnik;
                 }
-            });
+            }, false);
         }
 
         if (!NetworkConnection.hasConnection(this))
@@ -95,7 +95,7 @@ public class KvizomatApp extends Application {
             public void onCallback(Korisnik korisnik) {
                 trenutniKorisnik = korisnik;
             }
-        });
+        }, false);
     }
 
     public void setTrenutniKorisnik(Korisnik trenutniKorisnik) {
@@ -147,7 +147,7 @@ public class KvizomatApp extends Application {
         if (trenutniKorisnik != null) {
             callback.onCallback(trenutniKorisnik);
         } else {
-            setKorisnik(callback);
+            setKorisnik(callback, false);
         }
     }
 
@@ -244,8 +244,8 @@ public class KvizomatApp extends Application {
         });
     }
 
-    public void setKorisnik(final FirebaseKorisnikCallback callback) {
-        if (trenutniUser != null) {
+    public void setKorisnik(final FirebaseKorisnikCallback callback, boolean ponovo) {
+        if (trenutniUser != null || ponovo) {
             korisniciReference.child(trenutniUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -284,6 +284,8 @@ public class KvizomatApp extends Application {
 
                 }
             });
+        } else {
+            callback.onCallback(trenutniKorisnik);
         }
     }
 
@@ -291,19 +293,43 @@ public class KvizomatApp extends Application {
         return tokenReference;
     }
 
-    public void napraviNovuListuKvizova(final ListaKvizovaCallback callback) {
-        final ArrayList<Kviz> kList = new ArrayList<>();
-        kvizoviReference.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void pronadiKviz(String key, final ListaKvizovaCallback callback) {
+        kvizoviReference.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    if (trenutniKorisnik.getOnlineKvizovi().contains(ds.getKey())) {
-                        Kviz k = new Kviz(ds, trenutniKorisnik.getUid());
-                        k.setKey(ds.getKey());
-                        kList.add(k);
+                Kviz k = new Kviz(dataSnapshot, trenutniKorisnik.getUid());
+                k.setKey(dataSnapshot.getKey());
+                ArrayList<Kviz> kl = new ArrayList<>();
+                kl.add(k);
+                callback.onListaGotova(kl);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void napraviNovuListuKvizova(final ListaKvizovaCallback callback) {
+        kvizoviReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                setKorisnik(new FirebaseKorisnikCallback() {
+                    @Override
+                    public void onCallback(Korisnik korisnik) {
+                        ArrayList<Kviz> kList = new ArrayList<>();
+                        for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                            if (korisnik.getOnlineKvizovi().contains(ds.getKey())) {
+                                Kviz k = new Kviz(ds, trenutniKorisnik.getUid());
+                                k.setKey(ds.getKey());
+                                kList.add(k);
+                            }
+                        }
+                        callback.onListaGotova(kList);
+
                     }
-                }
-                callback.onListaGotova(kList);
+                }, true);
             }
 
             @Override
@@ -344,7 +370,7 @@ public class KvizomatApp extends Application {
         Kviz k = info.getKviz();
         k.setOdgovori(odgovori);
         HashMap<String, Object> m = k.toHashMap();
-        kvizoviReference.child(info.getKey()).setValue(m).addOnCompleteListener(new OnCompleteListener<Void>() {
+        kvizoviReference.child(info.getKviz().getKey()).setValue(m).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 callback.onPoslano();

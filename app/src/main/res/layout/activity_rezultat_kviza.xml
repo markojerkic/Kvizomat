@@ -19,8 +19,7 @@
             android:paddingTop="25dp"
             android:paddingLeft="25dp"
             android:paddingRight="25dp"
-            android:orientation="vertical"
-            android:id="@+id/rezultat_kviz_linear_layout">
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
@@ -32,6 +31,40 @@
                 android:layout_marginBottom="35dp"
                 android:fontFamily="@font/raleway_bold"
                 android:gravity="center_horizontal" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="25dp"
+                android:layout_marginTop="25dp"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="150dp"
+                    android:textSize="20dp"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/raleway_bold"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rezultat_tv_bodovi"
+                    android:text="test"/>
+                <TextView
+                    android:layout_width="150dp"
+                    android:textSize="20dp"
+                    android:fontFamily="@font/raleway_bold"
+                    android:textColor="@color/white"
+                    android:textAlignment="textEnd"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rezultat_pr_bodovi"
+                    android:text="Protivnikovi bodovi:\nNije riješio/la"
+                    android:gravity="end" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/rezultat_kviz_linear_layout"
+                android:divider="@drawable/razdjeljak"
+                android:showDividers="middle"
+                android:orientation="vertical"/>
+
 
         </LinearLayout>
 

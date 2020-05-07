@@ -183,7 +183,7 @@ public class KvizActivity extends AppCompatActivity {
 
     private void zatvoriAktivnost() {
         Toast.makeText(getApplicationContext(), "Doviđenja", Toast.LENGTH_SHORT).show();
-        mKorisnik.setBodovi(mKorisnik.getBodovi() + bodovi);
+        mKorisnik.setBodovi(mKorisnik.getBodovi() + Bodovi.izracunajBodove(mInfo.getListaPitanja(), odgovoriKorisnika));
 
         app.setBodovi(mKorisnik.getBodovi());
         app.setTrenutniKorisnik(mKorisnik);

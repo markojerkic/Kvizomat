@@ -3,7 +3,6 @@ package com.markojerkic.kvizomat.ui.home;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +31,7 @@ import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.markojerkic.kvizomat.ui.kviz.KvizActivity;
 import com.markojerkic.kvizomat.ui.kviz.KvizInformacije;
 import com.markojerkic.kvizomat.ui.kviz.Pitanje;
+import com.markojerkic.kvizomat.ui.kviz.RezultatKvizaActivity;
 import com.markojerkic.kvizomat.ui.kviz.multiplayer.Kviz;
 import com.markojerkic.kvizomat.ui.kviz.multiplayer.ListaKvizovaCallback;
 import com.markojerkic.kvizomat.ui.kviz.multiplayer.MultiplayerKviz;
@@ -73,48 +73,16 @@ public class HomeFragment extends Fragment {
 
         app = (KvizomatApp) getContext().getApplicationContext();
 
-//        mRefPitanja = firebaseDatabase.getReference("pitanja");
-//        dbKorisnici = firebaseDatabase.getReference("korisniciOnline");
-
         // Set MainActivity main buttons upon entering
         mSoloIgra = root.findViewById(R.id.last_man_button);
         mIgraProtivPrijatelja = root.findViewById(R.id.friendly_quitz_button);
         mBrojBodovaUkupni = root.findViewById(R.id.ukupan_br_bodova);
         mHomeLinearLayout = root.findViewById(R.id.home_linear_layout);
 
-
-//        mFunction.getHttpsCallable("sendNotification")
-//                .call(mFirebaseUser.getProviderId())
-//                .addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
-//            @Override
-//            public void onComplete(@NonNull Task<HttpsCallableResult> task) {
-//                Log.d("Test", "Testic");
-//            }
-//        }).isComplete();
-
         decimalFormat = new DecimalFormat();
         decimalFormat.setMaximumFractionDigits(2);
 
-        // Database listener
         mListaPitanja = new ArrayList<>();
-
-//        mRefPitanja.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-//                    Pitanje pitanje = ds.getValue(Pitanje.class);
-//                    mListaPitanja.add(pitanje);
-//                }
-//                setOnClick();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-
-//        findKorisnik();
         setOnClick();
 
         return root;
@@ -184,12 +152,7 @@ public class HomeFragment extends Fragment {
             if (mTrenutniUser != null)
                 findKorisnik();
         } else {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getKvizovi(true);
-                }
-            }, 100);
+            getNoviKvizovi();
         }
     }
 
@@ -210,7 +173,7 @@ public class HomeFragment extends Fragment {
                     float bodovi = mTrenutniKorisnik.getBodovi();
                     mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(bodovi));
                 }
-            });
+            }, false);
         } else {
             float bodovi = mTrenutniKorisnik.getBodovi();
             mBrojBodovaUkupni.setText("Tvoji bodovi: " + decimalFormat.format(bodovi));
@@ -260,7 +223,7 @@ public class HomeFragment extends Fragment {
     private boolean provjeriDodajPitanje(ArrayList<Pitanje> pitanjaRez, Pitanje trPit) {
         return !pitanjaRez.contains(trPit);
     }
-    private void getKvizovi(boolean t) {
+    private void getNoviKvizovi() {
         app.napraviNovuListuKvizova(new ListaKvizovaCallback() {
             @Override
             public void onListaGotova(ArrayList<Kviz> lKviz) {
@@ -290,7 +253,7 @@ public class HomeFragment extends Fragment {
             View onlineKvizoviNaslov = inflater.inflate(R.layout.naslov_online_kvizovi, null);
             mHomeLinearLayout.addView(onlineKvizoviNaslov);
             int br = Math.min(listaKvizova.size(), brojKvizovaPrikazati);
-            for (int i = 0; i < br; i++) {
+            for (int i = listaKvizova.size()-1; i > listaKvizova.size() - br; i--) {
                 inflateOnlineKviz(kvizoviView, listaKvizova.get(i), inflater);
             }
         }
@@ -318,7 +281,7 @@ public class HomeFragment extends Fragment {
             setOnClickOnlineKviz(v, kviz);
 
             if (kviz.getOdgovoriTrKor() != null) {
-                bodovi.setText("Vaši bodovi: " + kviz.getBodTr());
+                bodovi.setText("Vaši bodovi: " + decimalFormat.format(kviz.getBodTr()));
             }
 
             if (kviz.getOdgovoriIzazivac() != null && kviz.getOdgovoriTrKor() != null) {
@@ -361,6 +324,11 @@ public class HomeFragment extends Fragment {
                     }
                 } else {
                     Toast.makeText(getContext(), "Već ste riješili kviz", Toast.LENGTH_SHORT).show();
+                    Intent rez = new Intent(getActivity(), RezultatKvizaActivity.class);
+                    rez.putExtra("pitanja", kviz.getPitanja());
+                    rez.putExtra("odgovoriKorisnika", kviz.getOdgovoriTrKor());
+                    rez.putExtra("odgovoriIzaz", kviz.getOdgovoriIzazivac());
+                    startActivity(rez);
                 }
             }
         });
