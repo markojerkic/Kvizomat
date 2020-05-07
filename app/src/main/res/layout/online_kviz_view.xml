@@ -10,8 +10,26 @@
         android:layout_height="75dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:src="@mipmap/ic_launcher"
         android:id="@+id/slika_korisnika"/>
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/naslov_protiv"
+        android:text="Igra protiv:"
+        android:fontFamily="@font/raleway_bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/ime_korisnika"
+        app:layout_constraintEnd_toStartOf="@+id/slika_korisnika"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="15dp"
+        android:textSize="25dp"
+        android:textColor="@color/colorPrimaryDark"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -19,7 +37,7 @@
         android:id="@+id/ime_korisnika"
         android:text="Ime"
         android:fontFamily="@font/raleway_bold"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/naslov_protiv"
         app:layout_constraintBottom_toTopOf="@id/bodovi_online_tekst"
         app:layout_constraintEnd_toStartOf="@+id/slika_korisnika"
         app:layout_constraintStart_toStartOf="parent"

@@ -291,7 +291,28 @@ public class KvizomatApp extends Application {
         return tokenReference;
     }
 
+    public void napraviNovuListuKvizova(final ListaKvizovaCallback callback) {
+        final ArrayList<Kviz> kList = new ArrayList<>();
+        kvizoviReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    if (trenutniKorisnik.getOnlineKvizovi().contains(ds.getKey())) {
+                        Kviz k = new Kviz(ds, trenutniKorisnik.getUid());
+                        k.setKey(ds.getKey());
+                        kList.add(k);
+                    }
+                }
+                callback.onListaGotova(kList);
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
 
     public void napraviListuKvizova(final ListaKvizovaCallback callback) {
         if (listaKvizova != null) {

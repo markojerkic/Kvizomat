@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/home_linear_layout">
+        android:id="@+id/master_home_linear_layout">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -56,6 +56,14 @@
                 app:layout_constraintTop_toBottomOf="@+id/last_man_button"
                 android:layout_marginTop="25dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:divider="@drawable/razdjeljak"
+            android:showDividers="middle"
+            android:id="@+id/home_linear_layout"/>
 
     </LinearLayout>
 

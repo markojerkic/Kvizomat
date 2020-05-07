@@ -42,7 +42,7 @@ public class RezultatKvizaActivity extends AppCompatActivity {
         TextView tocanBoolean = v.findViewById(R.id.rezultat_tocno_boolean);
 
         pitanjeText.setText(pitanje.getPitanje());
-        tocanOdgovor.setText(pitanje.getTocanOdgovor());
+        tocanOdgovor.setText(pitanje.tocnoString());
         String odgovorKorisnika = odrediOdgovor(pitanje, brojOdgovora);
         String tocnoOdgovoreno = "";
         if (tocno) {

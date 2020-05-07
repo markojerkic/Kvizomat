@@ -134,7 +134,7 @@ public class KvizActivity extends AppCompatActivity {
     }
 
     private void provjeriTocnoOdgovor(Pitanje pitanje, Button tipka, int tipkaOdgovorBroj) {
-        if (pitanje.getTocanOdgovorInt() == tipkaOdgovorBroj) {
+        if (pitanje.getTocanOdgovor() == tipkaOdgovorBroj) {
             postaviTocno(pitanje, tipka);
             brojTocnihOdgovora++;
             tocniOdgovori[brojacPitanja++] = true;
@@ -142,7 +142,7 @@ public class KvizActivity extends AppCompatActivity {
             postaviNetocno(pitanje, tipka);
             tocniOdgovori[brojacPitanja++] = false;
         }
-        odgovoriKorisnika.add(tipkaOdgovorBroj);
+        odgovoriKorisnika.add((tipkaOdgovorBroj));
         mTocniOdgovoriText.setText(String.format("Točni odgovori: %d/%d", brojTocnihOdgovora, mInfo.getIterator()));
         if (mInfo.getIterator() % 3 == 0) {
             bodovi += ((float) brojTocnihOdgovora / (float) mInfo.getIterator())
@@ -213,7 +213,7 @@ public class KvizActivity extends AppCompatActivity {
 
     private void postaviNetocno(Pitanje pitanje, Button netocnaTipka) {
         netocnaTipka.setBackgroundColor(getResources().getColor(R.color.crveno_netocno));
-        switch (pitanje.getTocanOdgovorInt()) {
+        switch (pitanje.getTocanOdgovor()) {
             case 1:
                 mOdgovorA.setBackgroundColor(getResources().getColor(R.color.zeleo_tocno));
                 Log.e("kviz", "tocan odgovor a");

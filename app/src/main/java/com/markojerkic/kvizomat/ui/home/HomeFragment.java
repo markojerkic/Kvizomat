@@ -1,10 +1,9 @@
 package com.markojerkic.kvizomat.ui.home;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +21,6 @@ import androidx.lifecycle.ViewModelProviders;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.markojerkic.kvizomat.FirebaseKorisnikCallback;
@@ -51,19 +48,13 @@ public class HomeFragment extends Fragment {
     private static final int BROJ_KVIZOVA_PRIKAZATI = 10;
     private ArrayList<Pitanje> mListaPitanja;
 
-    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference mRefPitanja;
-    private DatabaseReference dbKorisnici;
-
     private FirebaseFunctions mFunction = FirebaseFunctions.getInstance();
-
 
     private HomeViewModel homeViewModel;
     private Button mSoloIgra;
     private Button mIgraProtivPrijatelja;
     private TextView mBrojBodovaUkupni;
     private LinearLayout mHomeLinearLayout;
-    private Dialog upisiInfoDialog;
 
     private KvizomatApp app;
 
@@ -72,6 +63,8 @@ public class HomeFragment extends Fragment {
     private String korisnikKey;
     private DecimalFormat decimalFormat;
     private ArrayList<Kviz> listaKvizova;
+    private ArrayList<View> kvizoviView;
+    private Kviz zadnjiKviz;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -176,11 +169,6 @@ public class HomeFragment extends Fragment {
         mIgraProtivPrijatelja.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Dialog uskoro = new Dialog(getContext());
-                uskoro.setContentView(R.layout.uskoro_stize);
-                uskoro.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-//                uskoro.show();
-
                 Intent postaviPitanjeActivity = new Intent(getActivity(), MultiplayerKviz.class);
                 startActivity(postaviPitanjeActivity);
                 Toast.makeText(getActivity(), "Iskušaj se protiv svojih prijatelja!", Toast.LENGTH_SHORT).show();
@@ -195,6 +183,13 @@ public class HomeFragment extends Fragment {
             mTrenutniUser = app.getTrenutniUser();
             if (mTrenutniUser != null)
                 findKorisnik();
+        } else {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getKvizovi(true);
+                }
+            }, 100);
         }
     }
 
@@ -265,6 +260,17 @@ public class HomeFragment extends Fragment {
     private boolean provjeriDodajPitanje(ArrayList<Pitanje> pitanjaRez, Pitanje trPit) {
         return !pitanjaRez.contains(trPit);
     }
+    private void getKvizovi(boolean t) {
+        app.napraviNovuListuKvizova(new ListaKvizovaCallback() {
+            @Override
+            public void onListaGotova(ArrayList<Kviz> lKviz) {
+                listaKvizova = lKviz;
+                Log.d("kvizovi", listaKvizova.toString());
+                mHomeLinearLayout.removeAllViews();
+                prikaziKvizove(BROJ_KVIZOVA_PRIKAZATI);
+            }
+        });
+    }
 
     private void getKvizovi() {
         app.napraviListuKvizova(new ListaKvizovaCallback() {
@@ -279,13 +285,13 @@ public class HomeFragment extends Fragment {
 
     private void prikaziKvizove(int brojKvizovaPrikazati) {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ArrayList<View> listaKvizView = new ArrayList<>();
+        kvizoviView = new ArrayList<>();
         if (listaKvizova.size() >= 1) {
             View onlineKvizoviNaslov = inflater.inflate(R.layout.naslov_online_kvizovi, null);
             mHomeLinearLayout.addView(onlineKvizoviNaslov);
             int br = Math.min(listaKvizova.size(), brojKvizovaPrikazati);
             for (int i = 0; i < br; i++) {
-                inflateOnlineKviz(listaKvizView, listaKvizova.get(i), inflater);
+                inflateOnlineKviz(kvizoviView, listaKvizova.get(i), inflater);
             }
         }
     }
@@ -299,10 +305,9 @@ public class HomeFragment extends Fragment {
             ime.setText(izaz.getIme());
 
             TextView bodovi = v.findViewById(R.id.bodovi_online_tekst);
-            bodovi.setText("0000");
+            bodovi.setText("Bodove treba zaraditi :)");
 
             TextView rijeseno = v.findViewById(R.id.zapoceo_kviz_tekst);
-            rijeseno.setText("Nisi rijesio");
 
             ImageView slika = v.findViewById(R.id.slika_korisnika);
             if (ProvjeraVeze.provjeriSlika(izaz, getContext()))
@@ -311,6 +316,22 @@ public class HomeFragment extends Fragment {
             listaKvizView.add(v);
 
             setOnClickOnlineKviz(v, kviz);
+
+            if (kviz.getOdgovoriTrKor() != null) {
+                bodovi.setText("Vaši bodovi: " + kviz.getBodTr());
+            }
+
+            if (kviz.getOdgovoriIzazivac() != null && kviz.getOdgovoriTrKor() != null) {
+                if (kviz.getBodTr() > kviz.getBodIza())
+                    rijeseno.setText("Pobijedili ste :)");
+                else
+                    rijeseno.setText("Izgubili ste :(");
+            } else if (kviz.getOdgovoriTrKor() != null && kviz.getOdgovoriIzazivac() == null)
+                rijeseno.setText("Protivnik još nije riješio kviz");
+            else if (kviz.getOdgovoriTrKor() == null && kviz.getOdgovoriIzazivac() != null)
+                rijeseno.setText("Niste riješili kviz");
+            else
+                rijeseno.setText("Nitko od vas dvoje nije riješio kviz");
 
             mHomeLinearLayout.addView(v);
         } catch (Exception e) {
@@ -324,17 +345,22 @@ public class HomeFragment extends Fragment {
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent pitanjeActivity = new Intent(getActivity(), KvizActivity.class);
+                if (kviz.getOdgovoriTrKor() == null) {
+                    final Intent pitanjeActivity = new Intent(getActivity(), KvizActivity.class);
 
-                Toast.makeText(getActivity(), R.string.postavljanje_pitanja, Toast.LENGTH_SHORT).show();
-                if (NetworkConnection.hasConnection(getContext())) {
-                    pitanjeActivity.putExtra("pitanja", new KvizInformacije(kviz, true, kviz.getKey()));
-                    pitanjeActivity.putExtra("korisnik", mTrenutniKorisnik);
-                    pitanjeActivity.putExtra("korisnikKey", korisnikKey);
-                    startActivity(pitanjeActivity);
-                    Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.postavljanje_pitanja, Toast.LENGTH_SHORT).show();
+                    if (NetworkConnection.hasConnection(getContext())) {
+                        zadnjiKviz = kviz;
+                        pitanjeActivity.putExtra("pitanja", new KvizInformacije(kviz, true, kviz.getKey()));
+                        pitanjeActivity.putExtra("korisnik", mTrenutniKorisnik);
+                        pitanjeActivity.putExtra("korisnikKey", korisnikKey);
+                        startActivity(pitanjeActivity);
+                        Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Već ste riješili kviz", Toast.LENGTH_SHORT).show();
                 }
             }
         });

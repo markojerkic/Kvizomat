@@ -10,18 +10,17 @@ import java.util.HashMap;
 public class Kviz implements Serializable {
     private ArrayList<Pitanje> pitanja;
     private String trKorisnikUid, izazivacUid;
-    private ArrayList<Integer> odgovoriTrKor, odgovoriIzazivac;
+    private ArrayList<Integer> odgovoriTrKor;
+    private ArrayList<Integer> odgovoriIzazivac;
     private String key;
+
+    private float bodTr, bodIza;
 
     public Kviz() {}
 
     public Kviz(DataSnapshot ds, String trKorisnikKey) {
         this.trKorisnikUid = (String)  ds.child("kor1").getValue();
         this.izazivacUid = (String)  ds.child("kor2").getValue();
-        if (ds.child("odgovoriKor1").exists())
-            this.odgovoriTrKor = (ArrayList<Integer>) ds.child("odgovoriKor1").getValue();
-        if (ds.child("odgovoriKor1").exists())
-            this.odgovoriIzazivac = (ArrayList<Integer>) ds.child("odgovoriKor2").getValue();
 
         this.pitanja = new ArrayList<>();
 
@@ -38,6 +37,23 @@ public class Kviz implements Serializable {
             this.pitanja.add(p);
         }
 
+        if (ds.child("odgovoriKor1").exists()) {
+            this.odgovoriTrKor = new ArrayList<>();
+            for (Long l: (ArrayList<Long>) ds.child("odgovoriKor1").getValue()) {
+                this.odgovoriTrKor.add(l.intValue());
+            }
+            assert this.odgovoriTrKor != null;
+            this.bodTr = izracunajBodove(this.odgovoriTrKor);
+        }
+        if (ds.child("odgovoriKor2").exists()) {
+            this.odgovoriIzazivac = new ArrayList<>();
+            for (Long l: (ArrayList<Long>) ds.child("odgovoriKor2").getValue()) {
+                this.odgovoriIzazivac.add(l.intValue());
+            }
+            assert this.odgovoriIzazivac != null;
+            this.bodIza = izracunajBodove(this.odgovoriIzazivac);
+        }
+
         if (!this.trKorisnikUid.equals(trKorisnikKey)) {
 
             String t = this.trKorisnikUid;
@@ -45,7 +61,14 @@ public class Kviz implements Serializable {
             this.izazivacUid = t;
 
             zamijeniOdgovore();
+            zamjeniBodove();
         }
+    }
+
+    private void zamjeniBodove() {
+        float t = this.bodIza;
+        this.bodIza = this.bodTr;
+        bodTr = t;
     }
 
     private void zamijeniOdgovore() {
@@ -89,6 +112,14 @@ public class Kviz implements Serializable {
 
     }
 
+    public ArrayList<Integer> getOdgovoriTrKor() {
+        return odgovoriTrKor;
+    }
+
+    public ArrayList<Integer> getOdgovoriIzazivac() {
+        return odgovoriIzazivac;
+    }
+
     public String getKey() {
         return key;
     }
@@ -110,5 +141,27 @@ public class Kviz implements Serializable {
             map.put("odgovoriKor1", this.odgovoriTrKor);
 
         return map;
+    }
+
+    private float izracunajBodove(ArrayList<Integer> odgovori) {
+        float rez = 0f;
+        for (int i = 0; i < odgovori.size()/4; i++) {
+            float z = 0f;
+            for (int j = 0; j < 3; j++) {
+                Integer o1 = odgovori.get(i + j);
+                int o2 = this.pitanja.get(i + j).getTocanOdgovor();
+                z += (o1.intValue() == o2)? 1f: 0f;
+            }
+            rez += z * (i+1) * 0.7f;
+        }
+        return rez;
+    }
+
+    public float getBodTr() {
+        return bodTr;
+    }
+
+    public float getBodIza() {
+        return bodIza;
     }
 }
