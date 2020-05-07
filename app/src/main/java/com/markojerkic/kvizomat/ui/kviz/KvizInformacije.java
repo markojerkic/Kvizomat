@@ -1,15 +1,35 @@
 package com.markojerkic.kvizomat.ui.kviz;
 
+import com.markojerkic.kvizomat.ui.kviz.multiplayer.Kviz;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class KvizInformacije implements Serializable {
     private ArrayList<Pitanje> mListaPitanja;
     private int iterator = 0;
+    private boolean online;
+    private String key;
+    private Kviz kviz;
 
     public KvizInformacije(ArrayList<Pitanje> pitanja) {
         this.mListaPitanja = pitanja;
+        this.online = false;
+        this.key = "-1";
     }
+
+    public KvizInformacije(Kviz kviz, boolean online, String key) {
+        this.kviz = kviz;
+        this.mListaPitanja = kviz.getPitanja();
+        this.online = online;
+        this.key = key;
+    }
+
+    public KvizInformacije(ArrayList<Pitanje> pitanja, boolean online, String key) {
+        this.mListaPitanja = pitanja;
+        this.online = online;
+    }
+
     public KvizInformacije() {}
 
     public ArrayList<Pitanje> getListaPitanja() {
@@ -25,4 +45,20 @@ public class KvizInformacije implements Serializable {
     public int brojPitanja() {return mListaPitanja.size();}
 
     public int getIterator() {return iterator;}
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public Kviz getKviz() {
+        return kviz;
+    }
+
+    public void setKviz(Kviz kviz) {
+        this.kviz = kviz;
+    }
 }

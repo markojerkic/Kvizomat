@@ -1,5 +1,6 @@
 package com.markojerkic.kvizomat.ui.kviz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -13,9 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.markojerkic.kvizomat.KvizomatApp;
+import com.markojerkic.kvizomat.OnlineKvizRjesenjeCallback;
 import com.markojerkic.kvizomat.R;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -48,6 +51,10 @@ public class KvizActivity extends AppCompatActivity {
     private Korisnik mKorisnik;
     private String mKorisnikKey;
 
+    private boolean[] tocniOdgovori;
+    private int brojacPitanja = 0;
+    private ArrayList<Integer> odgovoriKorisnika;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +80,9 @@ public class KvizActivity extends AppCompatActivity {
         mKorisnik = (Korisnik) getIntent().getSerializableExtra("korisnik");
         mKorisnikKey = (String) getIntent().getSerializableExtra("korisnikKey");
         trenutnoPitanje = mInfo.getNext();
+
+        tocniOdgovori = new boolean[mInfo.getListaPitanja().size()];
+        odgovoriKorisnika = new ArrayList<>(mInfo.getListaPitanja().size());
 
         postaviPitanja(trenutnoPitanje);
         provjeriKliknutOdgovor(trenutnoPitanje);
@@ -124,14 +134,16 @@ public class KvizActivity extends AppCompatActivity {
     }
 
     private void provjeriTocnoOdgovor(Pitanje pitanje, Button tipka, int tipkaOdgovorBroj) {
-        if (pitanje.getTocanOdgovor() == tipkaOdgovorBroj) {
+        if (pitanje.getTocanOdgovorInt() == tipkaOdgovorBroj) {
             postaviTocno(pitanje, tipka);
             brojTocnihOdgovora++;
+            tocniOdgovori[brojacPitanja++] = true;
         } else {
             postaviNetocno(pitanje, tipka);
+            tocniOdgovori[brojacPitanja++] = false;
         }
-        mTocniOdgovoriText.setText("Točni odgovori: " +
-                brojTocnihOdgovora + "/" + mInfo.getIterator());
+        odgovoriKorisnika.add(tipkaOdgovorBroj);
+        mTocniOdgovoriText.setText(String.format("Točni odgovori: %d/%d", brojTocnihOdgovora, mInfo.getIterator()));
         if (mInfo.getIterator() % 3 == 0) {
             bodovi += ((float) brojTocnihOdgovora / (float) mInfo.getIterator())
                     * ((float) pitanje.getTezinaPitanja() * 0.7f);
@@ -176,7 +188,21 @@ public class KvizActivity extends AppCompatActivity {
         app.setBodovi(mKorisnik.getBodovi());
         app.setTrenutniKorisnik(mKorisnik);
 
+        if (mInfo.isOnline()) {
+            app.setOnlineKvizRjesenje(odgovoriKorisnika, mInfo, new OnlineKvizRjesenjeCallback() {
+                @Override
+                public void onPoslano() {
+                    Toast.makeText(getApplicationContext(), "Poslani odgovori", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
 //        dbKorisnici.child(mKorisnikKey).child("bodovi").setValue(mKorisnik.getBodovi() + bodovi);
+        Intent rezultat = new Intent(this, RezultatKvizaActivity.class);
+        rezultat.putExtra("pitanja", mInfo.getListaPitanja());
+        rezultat.putExtra("tocno", tocniOdgovori);
+        rezultat.putExtra("odgovoriKorisnika", odgovoriKorisnika);
+        startActivity(rezultat);
         this.finish();
     }
 
@@ -187,7 +213,7 @@ public class KvizActivity extends AppCompatActivity {
 
     private void postaviNetocno(Pitanje pitanje, Button netocnaTipka) {
         netocnaTipka.setBackgroundColor(getResources().getColor(R.color.crveno_netocno));
-        switch (pitanje.getTocanOdgovor()) {
+        switch (pitanje.getTocanOdgovorInt()) {
             case 1:
                 mOdgovorA.setBackgroundColor(getResources().getColor(R.color.zeleo_tocno));
                 Log.e("kviz", "tocan odgovor a");

@@ -57,8 +57,18 @@ public class Pitanje implements Serializable {
     public String getRazneInformacije() {return this.mRazneInfomacije;}
 
     public void setTocanOdgovor(int tocno) {this.mTocanOdgovor = tocno;}
-    public int getTocanOdgovor() {return this.mTocanOdgovor;}
+    public int getTocanOdgovorInt() {return this.mTocanOdgovor;}
 
     public void setTezinaPitanja(int tezina) {this.mTezinaPitanja = tezina;}
     public int getTezinaPitanja() {return this.mTezinaPitanja;}
+
+    public String getTocanOdgovor() {
+        if (mTocanOdgovor == 1)
+            return mOdgovorA;
+        else if (mTocanOdgovor == 2)
+            return mOdgovorB;
+        else if (mTocanOdgovor == 3)
+            return mOdgovorC;
+        return mOdgovorD;
+    }
 }

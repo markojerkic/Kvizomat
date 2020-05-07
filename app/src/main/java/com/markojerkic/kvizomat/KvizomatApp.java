@@ -18,6 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
+import com.markojerkic.kvizomat.ui.kviz.KvizInformacije;
 import com.markojerkic.kvizomat.ui.kviz.Pitanje;
 import com.markojerkic.kvizomat.ui.kviz.multiplayer.Kviz;
 import com.markojerkic.kvizomat.ui.kviz.multiplayer.ListaKvizovaCallback;
@@ -25,6 +26,7 @@ import com.markojerkic.kvizomat.ui.kviz.multiplayer.ListaKvizovaCallback;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 
 public class KvizomatApp extends Application {
 
@@ -302,6 +304,7 @@ public class KvizomatApp extends Application {
                     for (DataSnapshot ds: dataSnapshot.getChildren()) {
                         if (trenutniKorisnik.getOnlineKvizovi().contains(ds.getKey())) {
                             Kviz k = new Kviz(ds, trenutniKorisnik.getUid());
+                            k.setKey(ds.getKey());
                             kList.add(k);
                         }
                     }
@@ -314,5 +317,18 @@ public class KvizomatApp extends Application {
                 }
             });
         }
+    }
+
+    public void setOnlineKvizRjesenje(ArrayList<Integer> odgovori, KvizInformacije info, final OnlineKvizRjesenjeCallback callback) {
+        Kviz k = info.getKviz();
+        k.setOdgovori(odgovori);
+        HashMap<String, Object> m = k.toHashMap();
+        kvizoviReference.child(info.getKey()).setValue(m).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                callback.onPoslano();
+            }
+        });
+
     }
 }

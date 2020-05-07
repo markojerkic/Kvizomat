@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -223,22 +222,6 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void dodajPrijatelje() {
-        ArrayList<View> prijateljiView = new ArrayList<>();
-
-        for (Korisnik prijatelj: app.getListaPrijatelja()) {
-            TextView t = new TextView(getContext());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                t.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            }
-            t.setText(prijatelj.getIme());
-            t.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
-            prijateljiView.add(t);
-            mHomeLinearLayout.addView(t);
-        }
-    }
-
     private ArrayList<Pitanje> randomPitanja (int brojPitanjaPoKat, ArrayList<Pitanje> pitanjaRez) {
         Random random = new Random();
         ArrayList<Pitanje> raz1 = new ArrayList<>();
@@ -326,11 +309,34 @@ public class HomeFragment extends Fragment {
                 Picasso.get().load(izaz.getUri()).into(slika);
 
             listaKvizView.add(v);
+
+            setOnClickOnlineKviz(v, kviz);
+
             mHomeLinearLayout.addView(v);
         } catch (Exception e) {
             if (izaz != null)
                 Log.d("Iznimka", izaz.toString());
         }
 
+    }
+
+    private void setOnClickOnlineKviz(View v, final Kviz kviz) {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent pitanjeActivity = new Intent(getActivity(), KvizActivity.class);
+
+                Toast.makeText(getActivity(), R.string.postavljanje_pitanja, Toast.LENGTH_SHORT).show();
+                if (NetworkConnection.hasConnection(getContext())) {
+                    pitanjeActivity.putExtra("pitanja", new KvizInformacije(kviz, true, kviz.getKey()));
+                    pitanjeActivity.putExtra("korisnik", mTrenutniKorisnik);
+                    pitanjeActivity.putExtra("korisnikKey", korisnikKey);
+                    startActivity(pitanjeActivity);
+                    Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
