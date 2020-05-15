@@ -57,7 +57,10 @@ public class Korisnik implements Serializable {
     }
 
     public ArrayList<String> getOnlineKvizovi() {
-        return onlineKvizovi;
+        if (this.onlineKvizovi != null)
+            return onlineKvizovi;
+        ArrayList<String> s = new ArrayList<>();
+        return s;
     }
 
     public void setOnlineKvizovi(ArrayList<String> onlineKvizovi) {

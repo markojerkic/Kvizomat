@@ -86,6 +86,12 @@ public class Kviz implements Serializable {
         this.izazivacUid = izazivacUid;
     }
 
+    public Kviz (String trKorisnikUid, ArrayList<Pitanje> pitanja) {
+        this.pitanja = pitanja;
+        this.trKorisnikUid = trKorisnikUid;
+        this.key = "-1";
+    }
+
     public ArrayList<Pitanje> getPitanja() {
         return this.pitanja;
     }
@@ -133,18 +139,23 @@ public class Kviz implements Serializable {
 
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("kor1", getTrKorisnikUid());
-        map.put("kor2", getIzazivacUid());
+        if (!zamjenjeno) {
+            map.put("kor1", getTrKorisnikUid());
+            map.put("kor2", getIzazivacUid());
+        } else {
+            map.put("kor2", getTrKorisnikUid());
+            map.put("kor1", getIzazivacUid());
+        }
         HashMap<String, Object> t = new HashMap<>();
         t.put("result", this.getPitanja());
         map.put("kvizPitanja", t);
         if (this.odgovoriIzazivac != null && !zamjenjeno)
             map.put("odgovoriKor2", this.odgovoriIzazivac);
-        else
+        else if (this.odgovoriTrKor != null && zamjenjeno)
             map.put("odgovoriKor2", this.odgovoriTrKor);
         if (this.odgovoriTrKor != null && !zamjenjeno)
             map.put("odgovoriKor1", this.odgovoriTrKor);
-        else
+        else if (this.odgovoriIzazivac != null && zamjenjeno)
             map.put("odgovoriKor1", this.odgovoriIzazivac);
 
         return map;

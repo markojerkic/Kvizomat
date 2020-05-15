@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.OnlineKvizRjesenjeCallback;
 import com.markojerkic.kvizomat.R;
+import com.markojerkic.kvizomat.ui.kviz.multiplayer.Kviz;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class KvizActivity extends AppCompatActivity {
     private DatabaseReference dbKorisnici = FirebaseDatabase.getInstance().getReference("korisniciOnline");
 
     private KvizInformacije mInfo;
+    private Kviz kviz;
 
     private Pitanje trenutnoPitanje;
     private Korisnik mKorisnik;
@@ -78,7 +80,13 @@ public class KvizActivity extends AppCompatActivity {
 
         mInfo = (KvizInformacije) getIntent().getSerializableExtra("pitanja");
         mKorisnik = (Korisnik) getIntent().getSerializableExtra("korisnik");
-        mKorisnikKey = (String) getIntent().getSerializableExtra("korisnikKey");
+        kviz = (Kviz) getIntent().getSerializableExtra("kviz");
+        boolean online = (boolean) getIntent().getSerializableExtra("online");
+        mKorisnikKey = mKorisnik.getUid();
+        if (online)
+            mInfo = new KvizInformacije(kviz, online, kviz.getKey());
+        else
+            mInfo = new KvizInformacije(kviz.getPitanja());
         trenutnoPitanje = mInfo.getNext();
 
         tocniOdgovori = new boolean[mInfo.getListaPitanja().size()];
@@ -186,6 +194,11 @@ public class KvizActivity extends AppCompatActivity {
         mKorisnik.setBodovi(mKorisnik.getBodovi() + Bodovi.izracunajBodove(mInfo.getListaPitanja(), odgovoriKorisnika));
 
         app.setBodovi(mKorisnik.getBodovi());
+        if (!mKorisnik.getOnlineKvizovi().contains(kviz.getKey()) && mInfo.isOnline()) {
+            ArrayList<String> s = mKorisnik.getOnlineKvizovi();
+            s.add(kviz.getKey());
+            mKorisnik.setOnlineKvizovi(s);
+        }
         app.setTrenutniKorisnik(mKorisnik);
 
         if (mInfo.isOnline()) {
@@ -201,7 +214,9 @@ public class KvizActivity extends AppCompatActivity {
         Intent rezultat = new Intent(this, RezultatKvizaActivity.class);
         rezultat.putExtra("pitanja", mInfo.getListaPitanja());
         rezultat.putExtra("tocno", tocniOdgovori);
+        rezultat.putExtra("online", mInfo.isOnline());
         rezultat.putExtra("odgovoriKorisnika", odgovoriKorisnika);
+        rezultat.putExtra("odgovoriIzaz", kviz.getOdgovoriIzazivac());
         startActivity(rezultat);
         this.finish();
     }

@@ -33,9 +33,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.markojerkic.kvizomat.ui.kviz.Bodovi;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
+import com.markojerkic.kvizomat.ui.kviz.multiplayer.Kviz;
+import com.markojerkic.kvizomat.ui.kviz.multiplayer.ListaKvizovaCallback;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -109,10 +113,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (extras != null) {
-            String izazivac = (String) extras.get("izazov");
-            if (izazivac != null) {
-                Log.d("izazivac", izazivac);
-                Toast.makeText(this, izazivac + " vas je izazvao", Toast.LENGTH_SHORT).show();
+
+            String izazivacUID =  extras.getString("izazivac");
+            final String kvizKey =  extras.getString("kviz");
+            if (izazivacUID != null) {
+                final Korisnik izazivac = app.findPrijatelj(izazivacUID);
+                Toast.makeText(this, izazivac.getIme() + " vas je izazvao", Toast.LENGTH_SHORT).show();
                 izazovDialog = new Dialog(this);
                 izazovDialog.setContentView(R.layout.popup_korisnik);
                 TextView imeIzazov = izazovDialog.findViewById(R.id.korisnik_popup_ime);
@@ -120,13 +126,27 @@ public class MainActivity extends AppCompatActivity {
                 Button odustani = izazovDialog.findViewById(R.id.odustani_prijatelj);
 
                 prihvati.setText("Prihvati");
-                imeIzazov.setText(izazivac + "\nvas izaziva na dvoboj");
+                imeIzazov.setText(izazivac.getIme() + "\nvas izaziva na dvoboj");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                     imeIzazov.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 }
                 prihvati.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        app.pronadiKviz(kvizKey, new ListaKvizovaCallback() {
+                            @Override
+                            public void onListaGotova(ArrayList<Kviz> listaKvizova) {
+                                if (listaKvizova.get(0).getOdgovoriTrKor() != null)
+                                    Bodovi.otvoriIzazov(getBaseContext(), trenutniKorisnik, izazivac,
+                                            app, listaKvizova.get(0));
+                                else {
+                                    Toast.makeText(getApplicationContext(), "Kviz ste već riješili",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        });
+
                         izazovDialog.cancel();
                     }
                 });

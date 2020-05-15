@@ -28,6 +28,7 @@ import com.markojerkic.kvizomat.FirebaseKorisnikCallback;
 import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
+import com.markojerkic.kvizomat.ui.kviz.Bodovi;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.markojerkic.kvizomat.ui.kviz.KvizActivity;
 import com.markojerkic.kvizomat.ui.kviz.KvizInformacije;
@@ -137,7 +138,9 @@ public class OnlinePrijatelji extends Fragment {
                 igrajPopup.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        izazovi(izabraniPrijatelj.getUid());
+                        Bodovi.stvoriOnlineIntent(trenutniKorisnik, izabraniPrijatelj, app, getContext());
+//                        izazovi(izabraniPrijatelj.getUid());
+                        dialog.cancel();
                     }
                 });
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
@@ -172,6 +175,7 @@ public class OnlinePrijatelji extends Fragment {
                 Kviz k = listaKvizova.get(0);
                 intent.putExtra("pitanja", new KvizInformacije(k, true, k.getKey()));
                 intent.putExtra("korisnik", trenutniKorisnik);
+                intent.putExtra("kviz", k);
                 startActivity(intent);
 
             }

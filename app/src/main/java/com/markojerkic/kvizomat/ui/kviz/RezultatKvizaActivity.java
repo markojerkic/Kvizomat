@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class RezultatKvizaActivity extends AppCompatActivity {
     private ArrayList<Pitanje> pitanja;
-    private boolean[] tocno;
+    private boolean online;
     private ArrayList<Integer> odgovoriKorisnika, odgovoriIzaz;
     private LinearLayout linearLayout;
     private float trBod, izBod;
@@ -35,6 +35,7 @@ public class RezultatKvizaActivity extends AppCompatActivity {
         pitanja = (ArrayList<Pitanje>) getIntent().getSerializableExtra("pitanja");
         odgovoriKorisnika = (ArrayList<Integer>) getIntent().getSerializableExtra("odgovoriKorisnika");
         odgovoriIzaz = (ArrayList<Integer>) getIntent().getSerializableExtra("odgovoriIzaz");
+        online = (boolean) getIntent().getSerializableExtra("online");
 
         if (odgovoriKorisnika != null) {
             trBod = izrBod(odgovoriKorisnika);
@@ -76,6 +77,14 @@ public class RezultatKvizaActivity extends AppCompatActivity {
             odgovorTrKorTekst.setTextColor(getResources().getColor(R.color.zeleo_tocno));
         } else {
             odgovorTrKorTekst.setTextColor(getResources().getColor(R.color.crveno_netocno));
+        }
+
+        if (!online) {
+            odgovorProtivnikaTekst.setVisibility(View.GONE);
+            TextView n = v.findViewById(R.id.rezultat_protivnik_naslov);
+            n.setVisibility(View.GONE);
+            izBodoviText.setVisibility(View.GONE);
+            
         }
 
         if (odgovoriIzaz != null) {

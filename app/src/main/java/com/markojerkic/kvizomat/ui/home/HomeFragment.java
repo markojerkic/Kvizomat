@@ -17,16 +17,14 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 import com.markojerkic.kvizomat.FirebaseKorisnikCallback;
 import com.markojerkic.kvizomat.KvizomatApp;
 import com.markojerkic.kvizomat.NetworkConnection;
 import com.markojerkic.kvizomat.R;
 import com.markojerkic.kvizomat.ui.ProvjeraVeze;
+import com.markojerkic.kvizomat.ui.kviz.Bodovi;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 import com.markojerkic.kvizomat.ui.kviz.KvizActivity;
 import com.markojerkic.kvizomat.ui.kviz.KvizInformacije;
@@ -39,7 +37,6 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Random;
 
 public class HomeFragment extends Fragment {
@@ -88,49 +85,13 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
-    public Task<HttpsCallableResult> getCloudPitanja() {
-        final boolean[] done = {false};
-            Task<HttpsCallableResult> task = mFunction.getHttpsCallable("nasumicnaPitanja ")
-                    .call();
-            return task;
-    }
+
 
     public void setOnClick() {
         mSoloIgra.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent pitanjeActivity = new Intent(getActivity(), KvizActivity.class);
-                final ArrayList<Pitanje> pitanja = new ArrayList<>();
-                Toast.makeText(getActivity(), R.string.postavljanje_pitanja, Toast.LENGTH_SHORT).show();
-                if (NetworkConnection.hasConnection(getContext())) {
-
-                    Task<HttpsCallableResult> task = getCloudPitanja();
-
-                    task.addOnCompleteListener(new OnCompleteListener<HttpsCallableResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<HttpsCallableResult> task) {
-                            ArrayList<Map<String, Object>> o = (ArrayList<Map<String, Object>>) task.getResult().getData();
-                            for (Map<String, Object> ob : o) {
-                                pitanja.add(new Pitanje(ob));
-                                Log.d("Cloud fun", String.valueOf(pitanja.size()));
-                            }
-                            pitanjeActivity.putExtra("pitanja", new KvizInformacije(pitanja));
-                            pitanjeActivity.putExtra("korisnik", mTrenutniKorisnik);
-                            pitanjeActivity.putExtra("korisnikKey", korisnikKey);
-                            startActivity(pitanjeActivity);
-                            Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    if (!NetworkConnection.hasConnection(getContext()))
-                        mListaPitanja = app.getListaPitanja();
-                    randomPitanja(BROJ_PITANJA_PO_KATEGORIJI, pitanja);
-                    pitanjeActivity.putExtra("pitanja", new KvizInformacije(pitanja));
-                    pitanjeActivity.putExtra("korisnik", mTrenutniKorisnik);
-                    pitanjeActivity.putExtra("korisnikKey", korisnikKey);
-                    startActivity(pitanjeActivity);
-                    Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
-                }
+                Bodovi.pokreniSoloKviz(getContext(), mTrenutniKorisnik, app);
             }
         });
 

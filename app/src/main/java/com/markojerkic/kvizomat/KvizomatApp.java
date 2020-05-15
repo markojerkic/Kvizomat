@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.markojerkic.kvizomat.ui.kviz.Korisnik;
@@ -37,6 +38,7 @@ public class KvizomatApp extends Application {
     private DatabaseReference kvizoviReference;
     private ArrayList<Pitanje> listaPitanja;
     private FirebaseDatabase database;
+    private FirebaseFunctions mFunction;
 
     public static boolean spremno = false;
 
@@ -61,6 +63,7 @@ public class KvizomatApp extends Application {
         pitanjaReference.keepSynced(true);
         tokenReference.keepSynced(true);
         kvizoviReference.keepSynced(true);
+        mFunction = FirebaseFunctions.getInstance();
 
         if (trenutniUser == null && FirebaseAuth.getInstance().getCurrentUser() != null)
             setTrenutniUser();
@@ -324,6 +327,9 @@ public class KvizomatApp extends Application {
                                 Kviz k = new Kviz(ds, trenutniKorisnik.getUid());
                                 k.setKey(ds.getKey());
                                 kList.add(k);
+                            } else {
+                                Log.d("Nema", ds.getKey());
+                                Log.d("Nema", "+++");
                             }
                         }
                         callback.onListaGotova(kList);
@@ -353,6 +359,9 @@ public class KvizomatApp extends Application {
                             Kviz k = new Kviz(ds, trenutniKorisnik.getUid());
                             k.setKey(ds.getKey());
                             kList.add(k);
+                        } else {
+                            Log.d("Nema", ds.getKey());
+                            Log.d("Nema", "+++");
                         }
                     }
                     callback.onListaGotova(kList);
@@ -377,5 +386,9 @@ public class KvizomatApp extends Application {
             }
         });
 
+    }
+
+    public FirebaseFunctions getmFunction() {
+        return mFunction;
     }
 }

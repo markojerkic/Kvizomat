@@ -9,28 +9,31 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.markojerkic.kvizomat.ui.kviz.Korisnik;
 
 import java.util.Map;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
+    public void onMessageReceived(final RemoteMessage remoteMessage) {
         Log.d("Test", remoteMessage.getNotification().getBody());
 
         KvizomatApp app = (KvizomatApp) getApplication();
 
         Map<String, String> messageData = remoteMessage.getData();
         String s =  messageData.toString();
-        Korisnik izazivac = app.findPrijatelj(remoteMessage.getData().get("izazivatelj"));
+        String izazivac = remoteMessage.getData().get("izazivatelj");
         String mojUid = remoteMessage.getData().get("protivnik");
         String kviz = remoteMessage.getData().get("kviz");
-        Log.d("izazov", mojUid);
+        obavijestPosalji(kviz, izazivac, remoteMessage);
         Log.d("izazov", kviz);
+    }
+
+    private void obavijestPosalji(String k, String izazivac, RemoteMessage remoteMessage) {
 
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("izazov", izazivac.getIme());
+        intent.putExtra("izazivac", izazivac);
+        intent.putExtra("kviz", k);
 
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
