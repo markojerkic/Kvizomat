@@ -81,9 +81,9 @@ public class KvizActivity extends AppCompatActivity {
         mInfo = (KvizInformacije) getIntent().getSerializableExtra("pitanja");
         mKorisnik = (Korisnik) getIntent().getSerializableExtra("korisnik");
         kviz = (Kviz) getIntent().getSerializableExtra("kviz");
-        boolean online = (boolean) getIntent().getSerializableExtra("online");
+        Boolean online = (Boolean) getIntent().getSerializableExtra("online");
         mKorisnikKey = mKorisnik.getUid();
-        if (online)
+        if (online != null && online)
             mInfo = new KvizInformacije(kviz, online, kviz.getKey());
         else
             mInfo = new KvizInformacije(kviz.getPitanja());
