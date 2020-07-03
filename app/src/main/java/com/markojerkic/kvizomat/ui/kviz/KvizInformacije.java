@@ -14,7 +14,7 @@ public class KvizInformacije implements Serializable {
 
     public KvizInformacije(ArrayList<Pitanje> pitanja) {
         this.mListaPitanja = pitanja;
-        this.online = false;
+        this.online = true;
         this.key = "-1";
     }
 

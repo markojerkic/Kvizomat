@@ -44,8 +44,6 @@ public class KvizActivity extends AppCompatActivity {
 
     private DecimalFormat decimalFormat;
 
-    private DatabaseReference dbKorisnici = FirebaseDatabase.getInstance().getReference("korisniciOnline");
-
     private KvizInformacije mInfo;
     private Kviz kviz;
 
@@ -87,6 +85,8 @@ public class KvizActivity extends AppCompatActivity {
             mInfo = new KvizInformacije(kviz, online, kviz.getKey());
         else
             mInfo = new KvizInformacije(kviz.getPitanja());
+        if (mInfo.getKviz() == null && kviz != null)
+            mInfo.setKviz(kviz);
         trenutnoPitanje = mInfo.getNext();
 
         tocniOdgovori = new boolean[mInfo.getListaPitanja().size()];

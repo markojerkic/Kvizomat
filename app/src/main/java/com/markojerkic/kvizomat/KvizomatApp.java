@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 public class KvizomatApp extends Application {
 
@@ -174,12 +175,6 @@ public class KvizomatApp extends Application {
             }
         });
 
-//        rangListaPrijateljaAdapter = new RangListaPrijateljaAdapter(listaPrijatelja,
-//                getContext(), trKorisnik);
-//        if (!svi) {
-//            listaView.setAdapter(rangListaPrijateljaAdapter);
-//            rangListaPrijateljaAdapter.notifyDataSetChanged();
-//        }
     }
 
     public void setListaPrijatelja(ArrayList<String> prijatelji) {
@@ -378,7 +373,8 @@ public class KvizomatApp extends Application {
     public void setOnlineKvizRjesenje(ArrayList<Integer> odgovori, KvizInformacije info, final OnlineKvizRjesenjeCallback callback) {
         Kviz k = info.getKviz();
         k.setOdgovori(odgovori);
-        HashMap<String, Object> m = k.toHashMap();
+        HashMap<String, Object> m;
+        m = k.toHashMap();
         kvizoviReference.child(info.getKviz().getKey()).setValue(m).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {

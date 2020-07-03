@@ -118,7 +118,8 @@ public class MainActivity extends AppCompatActivity {
             final String kvizKey =  extras.getString("kviz");
             if (izazivacUID != null) {
                 final Korisnik izazivac = app.findPrijatelj(izazivacUID);
-                Toast.makeText(this, izazivac.getIme() + " vas je izazvao", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, izazivac.getIme() + " vas je izazvao",
+                        Toast.LENGTH_SHORT).show();
                 izazovDialog = new Dialog(this);
                 izazovDialog.setContentView(R.layout.popup_korisnik);
                 TextView imeIzazov = izazovDialog.findViewById(R.id.korisnik_popup_ime);

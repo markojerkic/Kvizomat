@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class RezultatKvizaActivity extends AppCompatActivity {
     private ArrayList<Pitanje> pitanja;
-    private boolean online;
+    private Boolean online;
     private ArrayList<Integer> odgovoriKorisnika, odgovoriIzaz;
     private LinearLayout linearLayout;
     private float trBod, izBod;
@@ -35,7 +35,7 @@ public class RezultatKvizaActivity extends AppCompatActivity {
         pitanja = (ArrayList<Pitanje>) getIntent().getSerializableExtra("pitanja");
         odgovoriKorisnika = (ArrayList<Integer>) getIntent().getSerializableExtra("odgovoriKorisnika");
         odgovoriIzaz = (ArrayList<Integer>) getIntent().getSerializableExtra("odgovoriIzaz");
-        online = (boolean) getIntent().getSerializableExtra("online");
+        online =(Boolean) getIntent().getSerializableExtra("online");
 
         if (odgovoriKorisnika != null) {
             trBod = izrBod(odgovoriKorisnika);

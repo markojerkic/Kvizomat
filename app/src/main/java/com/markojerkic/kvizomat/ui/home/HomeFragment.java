@@ -45,8 +45,6 @@ public class HomeFragment extends Fragment {
     private static final int BROJ_KVIZOVA_PRIKAZATI = 10;
     private ArrayList<Pitanje> mListaPitanja;
 
-    private FirebaseFunctions mFunction = FirebaseFunctions.getInstance();
-
     private HomeViewModel homeViewModel;
     private Button mSoloIgra;
     private Button mIgraProtivPrijatelja;
@@ -278,6 +276,8 @@ public class HomeFragment extends Fragment {
                         pitanjeActivity.putExtra("pitanja", new KvizInformacije(kviz, true, kviz.getKey()));
                         pitanjeActivity.putExtra("korisnik", mTrenutniKorisnik);
                         pitanjeActivity.putExtra("korisnikKey", korisnikKey);
+                        pitanjeActivity.putExtra("kviz", kviz);
+                        pitanjeActivity.putExtra("online", true);
                         startActivity(pitanjeActivity);
                         Toast.makeText(getActivity(), R.string.ulazak_u_igru_toast, Toast.LENGTH_SHORT).show();
                     } else {
@@ -289,6 +289,7 @@ public class HomeFragment extends Fragment {
                     rez.putExtra("pitanja", kviz.getPitanja());
                     rez.putExtra("odgovoriKorisnika", kviz.getOdgovoriTrKor());
                     rez.putExtra("odgovoriIzaz", kviz.getOdgovoriIzazivac());
+                    rez.putExtra("online", true);
                     startActivity(rez);
                 }
             }
