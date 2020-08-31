@@ -12,8 +12,8 @@ android {
         minSdkVersion 16
         targetSdkVersion 29
         // Doano je 25. ožujka
-        versionCode 6
-        versionName "Alpha 1.005"
+        versionCode 7
+        versionName "Alpha 1.1"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
